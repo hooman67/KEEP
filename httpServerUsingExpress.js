@@ -1,8 +1,20 @@
 //nodejs call to import express module
 var express = require('express');
+var bodyParser = require('body-parser')
 
 //all express commands are app.
 var app = express();
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+// parse application/json
+app.use(bodyParser.json())
+
+
+
+
+/*******************ROUTERS*************************/
 
 /*
 app.get('/', function(req,res){
@@ -79,11 +91,25 @@ app.get('/me',function(req,res){
 */
 
 
-app.use(function(req,res){
-res.send('this is me');
+//app.use(function(req,res){
+//res.send("hel");
+//})
+
+
+
+
+app.get('/', function(req,res){
+console.log(req.body);
+res.send(req.body);
 })
 
-app.listen(3010, function() {
-	console.log('were listening on port 3010')
+app.post('/', function(req,res){
+console.log(req.body);
+res.send(req.body);
+})
+
+
+app.listen(3011, function() {
+	console.log('were listening on port 3011')
 })
 

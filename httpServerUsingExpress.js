@@ -14,7 +14,60 @@ app.put('/', function(req,res){
 console.log('recieved put request')
 })
 
+
+
+var cb0 = function (req, res, next) {
+  console.log('CB0')
+//  res.send('Hello from A!')
+  next()
+}
+
+var cb1 = function (req, res, next) {
+  console.log('CB1')
+//  res.send('Hello from B!')
+  next()
+}
+
+var cb2 = function (req, res) {
+  res.send('Hello from C!')
+}
+
+//app.get('/me',[cb0,cb1,cb2])
+
+//app.get('/me',function(req,res){
+//	res.download('httpServerUsingExpress.js');
+//})
+
+//app.get('/me',function(req,res){
+//      res.end()
+//})
+
+app.get('/me', function (req, res, next) {
+
+  var options = {
+    root: __dirname + '/public/',
+    dotfiles: 'deny',
+    headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true
+    }
+  };
+
+  var fileName = 'Any file placed in /public directory';//req.params.name;
+  res.sendFile(fileName, options, function (err) {
+    if (err) {
+      console.log(err);
+      res.status(err.status).end();
+    }
+    else {
+      console.log('Sent:', fileName);
+    }
+  });
+
+});
+
+
 app.listen(3010, function() {
-	console.log('were listening on port 8787')
+	console.log('were listening on port 3010')
 })
 

@@ -4,6 +4,7 @@ var express = require('express');
 //all express commands are app.
 var app = express();
 
+/*
 app.get('/', function(req,res){
 	res.send('hellow word/n');
 console.log('received get request');
@@ -42,6 +43,8 @@ var cb2 = function (req, res) {
 //      res.end()
 //})
 
+*/
+
 /*app.get('/me', function (req, res, next) {
 
   var options = {
@@ -64,7 +67,7 @@ var cb2 = function (req, res) {
     }
   });
 
-});*/
+});
 
 app.get('/me',function(req,res){
     //  res.redirect(303,'http://example.com');
@@ -73,6 +76,12 @@ app.get('/me',function(req,res){
         res.redirect('/public/kos.txt');
 })
 
+*/
+
+
+app.use(function(req,res){
+res.send('this is me');
+})
 
 app.listen(3010, function() {
 	console.log('were listening on port 3010')

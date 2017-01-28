@@ -42,7 +42,7 @@ var cb2 = function (req, res) {
 //      res.end()
 //})
 
-app.get('/me', function (req, res, next) {
+/*app.get('/me', function (req, res, next) {
 
   var options = {
     root: __dirname + '/public/',
@@ -64,7 +64,14 @@ app.get('/me', function (req, res, next) {
     }
   });
 
-});
+});*/
+
+app.get('/me',function(req,res){
+    //  res.redirect(303,'http://example.com');
+//	res.redirect('/');
+//        res.redirect('/public');
+        res.redirect('/public/kos.txt');
+})
 
 
 app.listen(3010, function() {

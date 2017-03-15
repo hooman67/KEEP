@@ -149,7 +149,6 @@ app.get('/download', function(req, res){
 
       var filestream = fs.createReadStream(decodedImage);
       filestream.pipe(res);*/
-      res.end(decodedImage);
     });
 });
 

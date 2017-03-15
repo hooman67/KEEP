@@ -1,4 +1,3 @@
-var streamBuffers = require('stream-buffers');
 var fs = require('fs');
 var express = require('express');
 var path = require('path');
@@ -138,18 +137,13 @@ app.get('/download', function(req, res){
 	  console.log(hs);
 
 	  var decodedImage = new Buffer(hs.hsFile, 'base64');
+	 // res.setHeader('Content-disposition', 'attachment; filename=' + hs.file.originalname);
+	 // res.setHeader('Content-type', hs.file.mimetype);
 
-	  var fileInfo = hs.get('file');
-
-	  fs.writeFile(fileInfo.originalname, decodedImage, function(err) {
-	  		var filestream = fs.createReadStream(fileInfo.originalname);
-	  		
-	  		res.setHeader('Content-disposition', 'attachment; filename=' + fileInfo.originalname);
-	  		res.setHeader('Content-type', fileInfo.mimetype);
-	  		filestream.pipe(res);
-	  });
+	  res.end(decodedImage);
 	});
 });
 
 module.exports = app;
+
 

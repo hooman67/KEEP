@@ -165,6 +165,11 @@ app.get('/display', function(req, res){
 	});
 });
 
+
+app.get('/pop', function( req, res ) {
+	res.render('popup');
+});
+
 module.exports = app;
 
 

@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  server_prod:
+      build:
+        context: .
+        dockerfile: ./Dockerfile/DockerfileProduction
+      ports:
+        - "8080:8080"
+      links:
+        - mongodb
+      container_name: ViDeX-Prod-App-Container
+      command: yarn run prod
+
+  mongodb:
+      image: mongo:latest
+      ports:
+        - "27017:27017"
+      container_name: ViDex-Prod-MongoDB-Container

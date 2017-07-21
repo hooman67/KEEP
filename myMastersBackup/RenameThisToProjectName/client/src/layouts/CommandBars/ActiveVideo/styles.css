@@ -1,0 +1,54 @@
+.container {
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: row;
+}
+
+.searchBox {
+  margin: 0.25em 0.1em;
+}
+
+.toggleContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0.10em 0.1em;
+  padding: 0px;
+  max-height: 45px;
+}
+
+.toggleLabel {
+  margin: 0.25em 0.1em;
+  text-align:center;
+    max-width: 70px;
+    padding: 0px;
+}
+
+.playHighlightContainer {
+  margin: 0.25em 0.1em;
+    max-width: 140px;
+}
+
+.addHighlightContainer {
+  margin: 0.25em 0.1em;
+    max-width: 140px;
+}
+
+.removeHighlightContainer {
+  margin: 0.25em 0.1em;
+    max-width: 140px;
+}
+
+.removeCommentContainer {
+  margin: 0.25em 0.1em;
+  max-width: 140px;
+}
+
+.addCommentContainer {
+  margin: 0.25em 0.1em;
+  max-width: 140px;
+}
+
+.addSideBarContainer {
+  margin: 0.25em 0.1em;
+}

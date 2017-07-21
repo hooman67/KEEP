@@ -1,0 +1,9 @@
+{
+  "CLIENT": {
+    "API": {
+      "LESSON_API_ENDPOINT": "http://videx.canadaeast.cloudapp.azure.com:8080/api/v1/lesson/",
+      "COURSES_API_ENDPOINT": "http://videx.canadaeast.cloudapp.azure.com:8080/api/v1/courses",
+      "COURSE_API_ENDPOINT": "http://videx.canadaeast.cloudapp.azure.com:8080/api/v1/course/"
+    }
+  }
+}

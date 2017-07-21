@@ -1,0 +1,35 @@
+# Set the base image to Ubuntu
+FROM ubuntu:trusty
+
+# File Author / Maintainer
+MAINTAINER UBC / Microsoft
+
+# Install Node.js and Yarn
+RUN apt-get update && \
+    apt-get -y install curl && \
+    apt-get -y install apt-transport-https && \
+    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash - && \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+RUN sudo apt-get update && \
+    sudo apt-get install -y yarn && \
+    sudo apt-get install -y nodejs
+
+# Provides cached layer for node_modules
+RUN mkdir -p /app
+
+ADD ./config /app/config
+ADD ./dist /app/dist
+ADD ./node_modules app/node_modules
+ADD ./shared /app/shared
+ADD ./server /app/server
+ADD ./index.html /app/index.html
+ADD ./package.json /app/package.json
+RUN cd /app
+
+# Define working directory
+WORKDIR /app
+
+# Expose port
+EXPOSE 8080

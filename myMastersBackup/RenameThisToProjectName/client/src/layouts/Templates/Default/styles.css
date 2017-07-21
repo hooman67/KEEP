@@ -1,0 +1,23 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.body {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
+}
+
+.sidebar {
+  max-width: 15em;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 15em;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 1em;
+}

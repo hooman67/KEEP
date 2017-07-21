@@ -1,0 +1,3 @@
+export const TRANSCRIPT_SEARCH_WORD: string = 'TRANSCRIPT_SEARCH_WORD';
+export const TRANSCRIPT_INIT: string = 'TRANSCRIPT_INIT';
+

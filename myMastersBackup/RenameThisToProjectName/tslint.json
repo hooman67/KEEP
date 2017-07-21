@@ -1,0 +1,83 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint-config-airbnb",
+        "tslint-react"
+    ],
+    "rules": {
+        "import-name": false,
+        "prefer-array-literal": {
+            "severity": "warning"
+        },
+        "quotemark": [
+            true,
+            "single",
+            "jsx-single"
+        ],
+        "eofline": true,
+        "no-require-imports": true,
+        "linebreak-style": [
+            true,
+            "LF"
+        ],
+        "no-magic-numbers": false,
+        "prefer-const": true,
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "always",
+                "singleline": "never"
+            }
+        ],
+        "curly": true,
+        "align": [
+            true,
+            "arguments",
+            "parameters",
+            "statements"
+        ],
+        "array-type": [
+            true,
+            "array"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-type",
+            "check-typecast",
+            "check-preblock"
+        ],
+        "no-irregular-whitespace": true,
+        "no-trailing-whitespace": true,
+        "space-before-function-paren": true,
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "no-consecutive-blank-lines": [
+            true,
+            1
+        ],
+        "variable-name": [
+            true,
+            "check-format"
+        ],
+        "one-line": [
+            true,
+            "check-catch",
+            "check-else",
+            "check-open-brace",
+            "check-whitespace"
+        ],
+        "max-line-length": [
+            true,
+            120
+        ]
+    },
+    "jsRules": {},
+    "rulesDirectory": []
+}

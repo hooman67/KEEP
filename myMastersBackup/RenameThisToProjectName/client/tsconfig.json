@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "allowSyntheticDefaultImports": true,
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "outDir": "build/",
+    "jsx": "preserve",
+    "typeRoots": [
+    "../node_modules/@types"
+]
+  },
+  "exclude": [
+    "node_modules",
+    "tests"
+  ]
+}

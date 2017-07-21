@@ -1,0 +1,11 @@
+.lessonContainer {
+  max-width: 600px;
+}
+
+.lessonTitle {
+  margin-top: 20px;
+}
+
+#videoUpload {
+  visibility: hidden;
+}

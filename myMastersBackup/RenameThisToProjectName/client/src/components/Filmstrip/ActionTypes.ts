@@ -1,0 +1,2 @@
+export const FILMSTRIP_RESIZE: string = 'FILMSTRIP_RESIZE';
+export const FILMSTRIP_UNMOUNT: string = 'FILMSTRIP_UNMOUNT';

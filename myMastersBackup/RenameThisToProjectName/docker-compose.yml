@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  node:
+      build:
+        context: .
+        dockerfile: ./Dockerfile/DockerfileDevelop
+      ports:
+        - "8080:8080"
+        - "9229:9229"
+      links:
+        - mongodb
+      volumes:
+        - ./client:/app/client
+        - ./server:/app/server
+        - ./config:/app/config
+        - ./index.html:/app/index.html
+        - ./webpack.dev.config.js:/app/webpack.dev.config.js
+        - ./package.json:/app/package.json
+      container_name: ViDeX-Dev-App-Container
+      command: yarn run dev
+
+  mongodb:
+      image: mongo:latest
+      ports:
+        - "27017:27017"
+      container_name: ViDex-Dev-MongoDB-Container

@@ -75,7 +75,7 @@ export default function (state = INITIAL_STATE, action) {
 
       console.log("Comment has been clicked");
       console.log(action.commentData);
-        state.videoPlayer.play();
+      state.videoPlayer.play();
       if (action.commentData.red.length > 0) {
         return {
           ...state,

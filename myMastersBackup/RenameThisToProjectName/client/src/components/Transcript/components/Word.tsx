@@ -9,7 +9,7 @@ import styles from './styles.css';
 import { getCSSColor } from '../TranscriptHelpers';
 import Comment from '../../Comment/Comment';
 
-export default class Index extends Component<IWordProps, any> {
+export default class Word extends Component<IWordProps, any> {
   constructor (props: any) {
     super(props);
     this.getHighlight = this.getHighlight.bind(this);
@@ -41,7 +41,7 @@ export default class Index extends Component<IWordProps, any> {
       */
       this.props.action.onCommentSelectSectionStart(this.props.word.start);
     }
-    
+
   }
 
   onMouseupHandler () {
@@ -59,7 +59,7 @@ export default class Index extends Component<IWordProps, any> {
         this.props.action.onCommentSelectSectionClear();
       }
     }
-    
+
   }
   seekPlayer () {
     this.props.action.onVideoPlayerSeek(this.props.word.start);

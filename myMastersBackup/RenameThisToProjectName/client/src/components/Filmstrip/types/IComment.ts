@@ -4,6 +4,9 @@ import {
 import {
   ICursorPosition,
 } from '../../../types';
+import {
+  IComment,
+} from '../../../services/Comment/types'
 
 export interface ICommentCore {
   dimensionsData: IFilmstripDimensionsData;
@@ -12,6 +15,12 @@ export interface ICommentCore {
   onVideoPlayerPlayCommentClick: Function;
   className: string;
   onCommentHover: Function;
+}
+
+export interface ICommentProps{
+  comments: IComment[];
+  className: string;
+  onCommentSendText: Function;
 }
 
 export interface ICommentData {
@@ -27,3 +36,4 @@ export interface ICommentData {
     Text: string,
   };
 }
+

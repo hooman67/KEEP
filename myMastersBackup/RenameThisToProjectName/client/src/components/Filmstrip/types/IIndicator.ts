@@ -38,9 +38,31 @@ export interface ITimestampIndicator {
 
 export interface ISelectSectionIndicator {
   dimensionsData: IFilmstripDimensionsData;
-  selectSectionData: {
+  selectSectionDataHighlight: {
     display: {
       x: number,
+      width: number,
+    },
+    selectSectionStartTime: number | null;
+    selectSectionEndTime: number | null;
+    status: ('free' | 'end' | 'start');
+  };
+  // selectSectionDataComment:{
+  //   display:{
+  //     x:number,
+  //     width: number,
+  //   },
+  //   selectSectionStartTime: number | null;
+  //   selectSectionEndTime: number | null;
+  //   status: ('free' | 'end' | 'start');
+  // };
+}
+
+export interface ISelectSectionIndicatorComment{
+   dimensionsData: IFilmstripDimensionsData;
+    selectSectionDataComment:{
+    display:{
+      x:number,
       width: number,
     },
     selectSectionStartTime: number | null;

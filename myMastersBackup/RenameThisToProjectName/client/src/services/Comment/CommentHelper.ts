@@ -32,29 +32,45 @@ export const updateCommentStateWithReplyAndText = (oldComments, newComment) => {
     return element._id === newComment.uuid;
   }
 
+  const parentIndex = oldComments.findIndex(isSameParentId);
+
+  if ( parentIndex !== -1){
+    const replyIndex = oldComments[parentIndex].Replies.findIndex(isSameId);
+    if(replyIndex !== -1 ){
+      oldComments[parentIndex].Replies[replyIndex].Text = newComment.Text;
+    }else{
+      console.log('hs Error: Could not find this reply in the parents list');
+    }
+  }else{
+    console.log('hs Error: Could not find the parent of this reply');
+  }
+
+  return [oldComments, oldComments[parentIndex]];
+}
+
+export const updateCommentStateWithReply = (oldComments, newComment) => {
+  function isSameParentId(element){
+    return element._id === newComment.Parent;
+  }
+
+  if (!newComment._id) {
+    newComment._id = uuid.v4();
+  }
 
   const parentIndex = oldComments.findIndex(isSameParentId);
 
   if ( parentIndex !== -1){
+    
     if(!oldComments[parentIndex].Replies){
       oldComments[parentIndex].Replies = [];
     }
-    //oldComments[parentIndex].Replies.push(newComment.uuid);
-    //Below works if you change the IComment.ts aswell
+
     oldComments[parentIndex].Replies.push(newComment);
   }
 
-
-  const targetIndex = oldComments.findIndex(isSameId);
-
-  if ( targetIndex !== -1){
-    //oldComments[targetIndex].Text = newComment.Text;
-    oldComments.splice(targetIndex,1);
-  }
-
-
   return [oldComments, oldComments[parentIndex]];
 }
+
 
 export const updateCommentStateWithText = (oldComments, newComment) => {
   function isSameId(element){

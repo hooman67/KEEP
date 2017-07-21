@@ -177,6 +177,7 @@ const highlightData = state => state.activeVideo.highlight ? state.activeVideo.h
 const viewCountData = state => state.activeVideo.viewcount ? state.activeVideo.viewcount.viewCounts : null;
 const currentTimeData = state => state.activeVideo.player ? state.activeVideo.player.currentTime : null;
 const highlightSelectSectionData = state => state.activeVideo.highlight ? state.activeVideo.highlight.selectSection : null;
+const commentSelectSectionData = state => state.activeVideo.comment ? state.activeVideo.comment.selectSection : null;
 const commentData = state => state.activeVideo.comment ? state.activeVideo.comment.commentData : null;
 
 // Level 1 Dimensions Selector
@@ -416,6 +417,65 @@ const timeMarkSelector = createSelector(
   },
 );
 
+/**
+ * Comment Section Selector for the filmstrip
+ * 
+ * @return ..commentSelectSectionData
+ */
+const commentSelectSectionSelector = createSelector(
+  filmstripDimensionsSelector,
+  commentSelectSectionData,
+  (filmstripDimensions, commentSelectSectionData) => {
+    if (!filmstripDimensions || !commentSelectSectionData) {
+      return null;
+    }
+    return filmstripDimensions.boundary.map((boundary) => {
+      let selectSectionEndTime: number = null;
+      let selectSectionStartTime: number = null;
+      let timestampEndSelectSection: number = null;
+      let timestampStartSelectSection: number = null;
+      if (commentSelectSectionData.status !== 'free' && commentSelectSectionData.selectSectionEndTime) {
+        console.log("commentSelectSectionSelector");
+        // calculate the start time and end time of the highlight select section
+        if (commentSelectSectionData.selectSectionEndTime < commentSelectSectionData.selectSectionStartTime) {
+          selectSectionEndTime = commentSelectSectionData.selectSectionStartTime;
+          selectSectionStartTime = commentSelectSectionData.selectSectionEndTime;
+        } else {
+          selectSectionEndTime = commentSelectSectionData.selectSectionEndTime;
+          selectSectionStartTime = commentSelectSectionData.selectSectionStartTime;
+        }
+
+        if (selectSectionEndTime > boundary.endTime) {
+          timestampEndSelectSection = boundary.endTime;
+        } else {
+          timestampEndSelectSection = selectSectionEndTime;
+        }
+
+        if (selectSectionStartTime < boundary.startTime) {
+          timestampStartSelectSection = boundary.startTime;
+        } else {
+          timestampStartSelectSection = selectSectionStartTime;
+        }
+
+        // check the start time and end time is valid or not
+        if (timestampStartSelectSection < timestampEndSelectSection) {
+          return ({
+            display: {
+              x: timestampToPixel(timestampStartSelectSection, boundary, filmstripDimensions),
+              width: timestampToPixel(timestampEndSelectSection, boundary, filmstripDimensions)
+              - timestampToPixel(timestampStartSelectSection, boundary, filmstripDimensions),
+            },
+            ...commentSelectSectionData,
+          });
+        }
+      }
+      return ({
+        display: null,
+        ...commentSelectSectionData,
+      });
+    });
+  },
+);
 
 // Level 2 Comment Selector
 const filmstripCommentSelector = createSelector(
@@ -482,9 +542,10 @@ export const filmstripAggregateSelector = createSelector(
   filmstripViewCountSelector,
   currentTimeSelector,
   highlightSelectSectionSelector,
+  commentSelectSectionSelector,
   filmstripCommentSelector,
   timeMarkSelector,
-  (filmstripDimensions, highlightData, viewCountData, currentTimeData, highlightSelectSectionData, filmstripCommentSelector, markerData) => {
+  (filmstripDimensions, highlightData, viewCountData, currentTimeData, highlightSelectSectionData, commentSelectSectionData, filmstripCommentSelector, markerData) => {
     if (
       !filmstripDimensions
       || !highlightData
@@ -516,7 +577,8 @@ export const filmstripAggregateSelector = createSelector(
         viewcountData: viewCountData[i],
         indicatorData: {
           currentTimeData: currentTimeData[i],
-          selectSectionData: highlightSelectSectionData[i],
+          selectSectionDataHighlight: highlightSelectSectionData[i],
+          selectSectionDataComment: commentSelectSectionData[i],
           markerData: markerData[i],
         },
       });

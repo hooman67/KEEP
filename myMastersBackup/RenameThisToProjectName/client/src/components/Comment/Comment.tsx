@@ -9,7 +9,7 @@ import {
   ActionCreator,
 } from '../../services/ActionCreator';
 
-export default class Index extends Component<ICommentProps, any> {
+export default class Comment extends Component<ICommentProps, any> {
   constructor (props: any) {
     super(props);
     this.saveComment = this.saveComment.bind(this);
@@ -36,7 +36,7 @@ export default class Index extends Component<ICommentProps, any> {
 
   saveComment(uuid, start, end, parent) {
     const val = (this.refs.newCommentText as HTMLInputElement).value;
-    
+
     console.log("hs saveComment entered:\n", uuid, "\n",val);
 
     this.props.action.onCommentSendText(uuid, start, end, val, parent);
@@ -45,14 +45,23 @@ export default class Index extends Component<ICommentProps, any> {
 
   generateCommentsReplies(comments){
     const result = (comments).map(comment => {
-      return(
-        <div className={styles.replyBlock}>
-          <h5>Parent: {comment.Parent}</h5>
-          {comment.Text}
-          <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
-          <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
-        </div>
-      );
+      if(comment.Text == ""){
+        return(
+          <div>
+            <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
+            <button onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent)}>Save</button>
+          </div>
+        );
+      }else{
+        return(
+          <div className={styles.replyBlock}>
+            {/*<h5>Parent: {comment.Parent}</h5>*/}
+            {comment.Text}
+            <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
+            <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
+          </div>
+        );
+      }
     })
     return(
       <span>
@@ -90,7 +99,7 @@ export default class Index extends Component<ICommentProps, any> {
           );
         }else{
           return(
-            <div>
+            <div className={styles.commentBlock}>
               {comment.Text}
               <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
               <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import uuid from 'uuid';
 import {
   IFilmstripDimensionsData,
   ICommentCore,
@@ -9,6 +10,7 @@ import {SidebarOpen} from '../../../../layouts/CommandBars/ActiveVideo/sidebarAc
 export default class CommentMapCore extends PureComponent<ICommentCore, any> {
   private enlarge: boolean;
   private preEnlarge: boolean;
+  private count: number;
 
   /**
    * CommentMapCore constructor function
@@ -19,6 +21,7 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
     super(props);
     this.preEnlarge = false;
     this.enlarge = false;
+    this.count = 1;
   }
 
     /**
@@ -63,6 +66,14 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
     }
   }
 
+  saveComment() {
+    const val = (this.refs.newCommentText as HTMLInputElement).value;
+    const uuid1 = uuid.v4();
+    
+    console.log("ss saveComment entered:\n", uuid1, "\n",val);
+    // this.props.onCommentSendText(uuid1 ,120,140,val);
+  }
+  
   /**
    * Renders the component.
    *
@@ -77,9 +88,8 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
     if (this.enlarge) {
       mag = 2;
     }
-
     return (
-      <svg
+         <svg
         className={this.props.className}
         width={dimensionsData.generalWidth}
         height={dimensionsData.comment.layerHeight * mag}
@@ -87,35 +97,17 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
         {
           commentData.map((data) => {
             return (
-              <rect
-                key={data.key}
+              <foreignObject      
                 x={data.x}
-                y={data.y * mag * dimensionsData.generalHeight}
-                width={data.width}
-                height={data.height * mag * dimensionsData.generalHeight}
-                fill={data.fill}
-                stroke='white'
-                strokeWidth={0.5}
-                strokeOpacity={0.9}
-                fillOpacity={0.9}
-                onMouseEnter = {this.onMouseEnterHandler.bind(this)}
-                onMouseLeave = {this.onMouseLeaveHandler}
-                onClick={() => this.props.onVideoPlayerPlayCommentClick(
-                  [
-                    {
-                      start: data.onClickData.start,
-                      end: data.onClickData.end,
-                      Text: data.onClickData.Text,
-                    },
-                    
-                  ],
-                  data.fill,
-                )}
-              />
+                y={data.y * mag * dimensionsData.generalHeight}>
+                  
+              </foreignObject>
             );
           })
         }
       </svg>
     );
+    
   }
 }
+

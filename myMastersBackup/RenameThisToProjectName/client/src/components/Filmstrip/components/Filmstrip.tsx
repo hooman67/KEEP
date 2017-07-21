@@ -15,6 +15,7 @@ export default (props: IFilmstrip) => {
         width: props.inputData.dimensionsData.generalWidth,
       }}
     >
+    
       <FilmstripEventWrapper
         inputData={props.inputData}
         actions={props.actions}

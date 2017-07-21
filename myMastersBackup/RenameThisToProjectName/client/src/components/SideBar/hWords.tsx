@@ -13,8 +13,8 @@ render(){
   const highlightTextEnd = this.props.hEnd;
 
   const startId = newTranscriptObj.filter(obj => obj.start === highlightTextStart)[0].id;
-  /* get transcriptObj id for endTime*/
-  const endId = newTranscriptObj.filter(obj => obj.end === highlightTextEnd)[0].id;
+  // /* get transcriptObj id for endTime*/
+  const endId = newTranscriptObj.filter((obj) => obj.end === highlightTextEnd)[0].id;
 
   const firstWord = newTranscriptObj[startId].text;
 

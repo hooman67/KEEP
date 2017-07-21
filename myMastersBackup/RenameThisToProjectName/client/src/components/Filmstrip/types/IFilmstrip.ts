@@ -25,7 +25,8 @@ export type TFilmstripInputData = {
   viewcountData: IViewCountData,
   indicatorData: {
     currentTimeData: number,
-    selectSectionData: any,
+    selectSectionDataHighlight: any,
+    selectSectionDataComment: any,
     markerData: any,
   },
 };
@@ -37,8 +38,13 @@ export type TFilmstripActions = {
   onHighlightSelectSectionStart: Function;
   onHighlightSelectSectionInProcess: Function;
   onHighlightSelectSectionEnd: Function;
+  onCommentSelectSectionStart: Function;
+  onCommentSelectSectionInProcess: Function;
+  onCommentSelectSectionClear: Function;
+  onCommentSelectSectionEnd: Function;
   onVideoPlayerPlayCommentClick: Function;
   onCommentHover: Function;
+  onCommentSendText: Function;
 };
 
 export interface IFilmstrip {

@@ -4,6 +4,7 @@ import {
   commentGenerateDiff,
   updateCommentStateWithText,
   updateCommentStateWithReplyAndText,
+  updateCommentStateWithReply,
   updateCommentStateWithCommentRemove,
   commentGenerateRemoveDiff,
   commentRemoveSingleColor,
@@ -191,63 +192,40 @@ export default (state = INITIAL_STATE, action) => {
         selectSectionEndTime: action.endTime,
         status: 'end',
       };
-      if (state.removeMultiColorComments) {
-        const newComments = commentRemoveAllColor(state.commentData, {
-          start: action.startTime,
-          end: action.endTime,
-          Text: action.Text,
-        });
-        const newCommentsUUID = {};
-        const commentUpdate = {
-          remove: [],
-          create: [],
-          edit:   [],
-        };
-        Object.keys(newComments).forEach((color) => {
-          const [newUUID, newUpdate] = commentGenerateDiff(newComments[color], state.commentData[color], color);
-          newCommentsUUID[color] = newUUID;
-          if (newUpdate.remove.length !== 0) {
-            commentUpdate.remove = [...commentUpdate.remove, ...newUpdate.remove];
-          }
-          if (newUpdate.create.length !== 0) {
-            commentUpdate.create = [...commentUpdate.create, ...newUpdate.create];
-          }
-        });
-        return {
-          ...state,
-          commentData: newComments,
-          commentUpdate,
-          selectSection,
-        };
-      }
+
       if (state.activeCommentColor) {
-        if (state.removeComment) {
-          const removedComments = commentRemoveSingleColor([...state.commentData[state.activeCommentColor]], {
+
+        if(action.Parent){
+          const [commentsReplyWithUUID, parentComment] = updateCommentStateWithReply([...state.commentData[state.activeCommentColor]], {
             start: action.startTime,
             end: action.endTime,
+            Text: action.Text,
+            Parent: action.Parent,
           });
-          const [commentsWithUUID, commentUpdate] = commentGenerateDiff(removedComments, state.commentData[state.activeCommentColor], state.activeCommentColor);
+
           return {
             ...state,
             commentData: {
               ...state.commentData,
-              [state.activeCommentColor]: commentsWithUUID,
+              [state.activeCommentColor]: commentsReplyWithUUID,
             },
-            commentUpdate,
+            commentUpdate:{
+              remove: [],
+              create: [],
+              edit:   [],
+            },
             selectSection,
           };
-        } else if (!state.removeComment) {
-          /*const mergedComment = commentMergeIntervals([...state.commentData[state.activeCommentColor], {
-            start: action.startTime,
-            end: action.endTime,
-          }]);*/
+        }else{
           const mergedComment = [...state.commentData[state.activeCommentColor], {
             start: action.startTime,
             end: action.endTime,
             Text: action.Text,
             Parent: action.Parent,
           }];
+
           const [commentsWithUUID, commentUpdate] = commentGenerateDiff(mergedComment, state.commentData[state.activeCommentColor], state.activeCommentColor);
+          
           return {
             ...state,
             commentData: {
@@ -262,11 +240,13 @@ export default (state = INITIAL_STATE, action) => {
             selectSection,
           };
         }
+
+      }else{
+        return {
+          ...state,
+          selectSection,
+        };
       }
-      return {
-        ...state,
-        selectSection,
-      };
 
     case actions.COMMENT_REMOVE_OFF:
       return {

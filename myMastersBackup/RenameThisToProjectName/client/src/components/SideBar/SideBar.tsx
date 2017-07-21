@@ -108,10 +108,6 @@ render () {
                                   };
 
 
-
-                          highlightTextStart = this.props.highlight.highlightData.red[0].start;
-                          highlightTextEnd = this.props.highlight.highlightData.red[0].end;
-
                           const divStyleRed = { backgroundColor: '#ffcccc'};
                           const divStyleBlue = { backgroundColor: '#80ccff'};
                           const divStyleGreen = { backgroundColor: '#b3ffb3'};

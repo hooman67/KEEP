@@ -233,15 +233,16 @@ class ActiveVideoCommandBar extends Component<any, any> {
           <DefaultButton
             iconProps={
               {
-                iconName: 'Edit',
+                iconName: 'Color',
                 style: {
                   color: this.props.comment.activeCommentColor,
                 },
               }
+
             }
-            text='Add Comment'
             menuProps={
               {
+              
                 items: commentPrivacyArray.map((color) => {
                   return {
                     key: color.name,
@@ -260,34 +261,24 @@ class ActiveVideoCommandBar extends Component<any, any> {
           >
           </DefaultButton>
         </div>
-        <div className={styles.removeCommentContainer}>
+        
+
+        <div className={styles.addCommentContainer}>
           <DefaultButton
-            iconProps={ { iconName: 'Remove' } }
-            text='Remove Comment'
-            menuProps={
+            iconProps={
               {
-                items: [
-                  {
-                    key: 'single',
-                    name: 'Single Color',
-                    onClick: this.props.onCommentSetCommentRemove,
-                  },
-                  {
-                    key: 'all',
-                    name: 'All Color',
-                    onClick: this.props.onCommentToggleMultipleCommentRemoval,
-                  },
-                  {
-                    key: 'none',
-                    name: 'None',
-                    onClick: this.props.onCommentRemoveOff,
-                  },
-                ],
+                iconName: 'Edit',
+                style: {
+                  color: this.props.comment.activeCommentColor,
+                },
               }
             }
           >
           </DefaultButton>
-          </div>
+        </div>
+
+
+
         <div className={styles.addSideBarContainer}>
           <PrimaryButton
           text='SideBar'

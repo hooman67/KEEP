@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import SelectIndicator from './SelectSectionIndicator';
+import SelectSectionIndicatorComment from './SelectSectionIndicatorComment';
 import TimestampIndicator from './TimestampIndicator';
 import TimeMarkIndicator from './TimeMarkIndicator';
 import MouseIndicator from './MouseIndicator';
@@ -19,10 +20,12 @@ export default class IndicatorCore extends PureComponent <IIndicatorCore, null> 
             <feComposite in='SourceGraphic'/>
           </filter>
         </defs>
-        <SelectIndicator
+
+        <SelectSectionIndicatorComment
           dimensionsData={this.props.dimensionsData}
-          selectSectionData={this.props.indicatorData.selectSectionData}
+          selectSectionDataComment={this.props.indicatorData.selectSectionDataComment} 
         />
+        
         <TimestampIndicator
           dimensionsData={this.props.dimensionsData}
           currentTimeData={this.props.indicatorData.currentTimeData}

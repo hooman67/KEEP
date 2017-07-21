@@ -15,12 +15,12 @@ export default class SelectSectionIndicator extends PureComponent <ISelectSectio
    * @return {ReactElement} - HTML markup for the component
    */
   render () {
-    if (this.props.selectSectionData.display) {
+    if (this.props.selectSectionDataHighlight.display) {
       return (
         <rect
-          x={this.props.selectSectionData.display.x}
+          x={this.props.selectSectionDataHighlight.display.x}
           y={0}
-          width={this.props.selectSectionData.display.width}
+          width={this.props.selectSectionDataHighlight.display.width}
           height={this.props.dimensionsData.indicator.layerHeight}
           fill='blue'
           opacity={0.3}

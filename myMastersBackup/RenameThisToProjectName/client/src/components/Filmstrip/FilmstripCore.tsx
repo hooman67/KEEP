@@ -11,6 +11,13 @@ import {
   onHighlightSelectSectionEnd,
 } from '../../services/Highlight';
 import {
+  onCommentSelectSectionStart,
+  onCommentSelectSectionInProcess,
+  onCommentSelectSectionClear,
+  onCommentSelectSectionEnd,
+  onCommentSendText
+} from '../../services/Comment';
+import {
   onVideoPlayerPlayHighlightStart,
   onVideoPlayerSeek,
   onVideoPlayerPlayCommentClick,
@@ -52,8 +59,13 @@ class FilmstripCore extends Component<any, any> {
                     onHighlightSelectSectionInProcess: this.props.onHighlightSelectSectionInProcess,
                     onHighlightSelectSectionEnd: this.props.onHighlightSelectSectionEnd,
                     onHighlightSelectSectionClear: this.props.onHighlightSelectSectionClear,
+                    onCommentSelectSectionStart: this.props.onCommentSelectSectionStart,
+                    onCommentSelectSectionInProcess: this.props.onCommentSelectSectionInProcess,
+                    onCommentSelectSectionClear: this.props.onCommentSelectSectionClear,
+                    onCommentSelectSectionEnd: this.props.onCommentSelectSectionEnd,
                     onVideoPlayerPlayCommentClick: this.props.onVideoPlayerPlayCommentClick,
                     onCommentHover: this.props.onCommentHover,
+                    onCommentSendText: this.props.onCommentSendText,
                   }}
                   inputData={data}
                 />
@@ -73,9 +85,14 @@ const actions = {
   onHighlightSelectSectionClear,
   onHighlightSelectSectionEnd,
   onVideoPlayerPlayHighlightStart,
+  onCommentSelectSectionStart,
+  onCommentSelectSectionInProcess,
+  onCommentSelectSectionClear,
+  onCommentSelectSectionEnd,
   onFilmstripResize,
   onVideoPlayerPlayCommentClick,
   onCommentHover,
+  onCommentSendText,
 };
 
 function mapStateToProps (state) {

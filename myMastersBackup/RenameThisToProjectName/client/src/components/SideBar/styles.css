@@ -1,0 +1,47 @@
+.transcriptFontsize {
+  font-size: 13pt !important;
+}
+
+.transcriptIndexFont {
+  font-size: 9pt;
+}
+
+.transcriptbutton {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font: inherit;
+  cursor: pointer;
+  color: blue;
+}
+
+.red {
+  color: red;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.selectText {
+  background: #3297FD;
+  color: white;
+}
+
+.replyBlock{
+  background:#d9d9d9;
+  border: 1px #ccc solid;
+  padding:10px;
+  margin-bottom:20px;
+  margin-top:20px;
+  margin-left:20px;
+  margin-right:20px;
+}
+
+.commentBlock{
+  background:#f4f4f4;
+  border: 2px #ccc solid;
+  padding:10px;
+  margin-bottom:20px;
+}
+

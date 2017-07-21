@@ -42,7 +42,7 @@ render () {
 
                                 return(
 
-                                  <SideBarCommentText text = {comments.Text} commentIndex = {index} />
+                                  <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} commentStart = {comments.start} commentEnd = {comments.end} commentArr = {comments}/>
                                 )}
                               );
                             } else

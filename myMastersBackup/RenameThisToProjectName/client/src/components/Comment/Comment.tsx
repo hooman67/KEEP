@@ -46,7 +46,7 @@ export default class Index extends Component<ICommentProps, any> {
   generateCommentsReplies(comments){
     const result = (comments).map(comment => {
       return(
-        <div>
+        <div className={styles.replyBlock}>
           <h5>Parent: {comment.Parent}</h5>
           {comment.Text}
           <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
@@ -69,12 +69,14 @@ export default class Index extends Component<ICommentProps, any> {
     const result = (this.props.comments).map(comment => {
       if(comment.Replies){
         return(
-          <div>
+          <div className={styles.commentBlock}>
             {comment.Text}
             {this.generateCommentsReplies(comment.Replies)}
+            <div>
             <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
             <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
             <button onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</button>
+            </div>
           </div>
         );
 

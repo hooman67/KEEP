@@ -24,8 +24,8 @@ export default class Comment extends Component<ICommentProps, any> {
     this.props.action.onCommentEditText(uuid, start, end, "");
   }
 
-  deleteComment(uuid, start, end) {
-    this.props.action.onCommentDeleteText(uuid, start, end, "");
+  deleteComment(uuid, start, end, parent) {
+    this.props.action.onCommentDeleteText(uuid, start, end, "", parent);
   }
 
   replyComment(uuid, start, end) {
@@ -58,7 +58,7 @@ export default class Comment extends Component<ICommentProps, any> {
             {/*<h5>Parent: {comment.Parent}</h5>*/}
             {comment.Text}
             <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
-            <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
+            <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
           </div>
         );
       }
@@ -83,7 +83,7 @@ export default class Comment extends Component<ICommentProps, any> {
             {this.generateCommentsReplies(comment.Replies)}
             <div>
             <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
-            <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
+            <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
             <button onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</button>
             </div>
           </div>
@@ -102,7 +102,7 @@ export default class Comment extends Component<ICommentProps, any> {
             <div className={styles.commentBlock}>
               {comment.Text}
               <button onClick={() => this.editComment(comment._id, comment.start, comment.end)}>Edit</button>
-              <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end)}>Delete</button>
+              <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
               <button onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</button>
             </div>
           );

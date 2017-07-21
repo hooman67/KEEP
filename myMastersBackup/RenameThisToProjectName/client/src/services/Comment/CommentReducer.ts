@@ -6,7 +6,6 @@ import {
   updateCommentStateWithReplyAndText,
   updateCommentStateWithReply,
   updateCommentStateWithCommentRemove,
-  commentGenerateRemoveDiff,
   commentRemoveSingleColor,
   commentRemoveAllColor,
 } from './CommentHelper';
@@ -55,14 +54,21 @@ export default (state = INITIAL_STATE, action) => {
       };
 
     case actions.COMMENT_DELETE_TEXT:
-     const deleteTextUpdatedComments = updateCommentStateWithCommentRemove([...state.commentData[state.activeCommentColor]], {
+      const commentToBeDeleted = {
         uuid: action.uuid,
         start: action.startTime,
         end: action.endTime,
         Text: action.Text,
-      });
+        Parent: action.Parent,
+      };
+      
+      const deleteTextUpdatedComments = updateCommentStateWithCommentRemove([...state.commentData[state.activeCommentColor]], commentToBeDeleted);
 
-      const [idOfSelectedDelete, commentUpdateDeleteText] = commentGenerateRemoveDiff(deleteTextUpdatedComments, action.uuid, state.commentData[state.activeCommentColor], state.activeCommentColor);
+      const commentUpdateDeleteText = {
+        remove: [commentToBeDeleted],
+        create: [],
+        edit:   [],
+      };
 
       return {
         ...state,

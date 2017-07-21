@@ -15,13 +15,37 @@ export const deleteComments = async (req, res) => {
   const userLessonQueryCommentsID = userLessonQueryResult.Comments.map((comment) => {
     return comment._id;
   });
+  /*const userLessonQueryCommentsParentID = userLessonQueryResult.Comments.map((comment) => {
+    return comment.Parent;
+  });*/
   if (req.body.Comments) {
     try {
-      for (const id of req.body.Comments) {
-        if (userLessonQueryCommentsID.includes(id)) {
-          userLessonQueryResult.Comments.pull(id);
-        } else {
-          throw new Error();
+      for (const commentData of req.body.Comments) {
+        console.log('hs DelCom req.body.Comments: ', req.body.Comments);
+        if(commentData.Parent){
+          console.log('hs deleteCommentReply sawReply data:\n', commentData);
+          userLessonQueryResult.Comments.forEach(function(comment){
+            if(comment._id === commentData.Parent){
+              console.log('hs deleteCommentReply found parent: ',
+                comment._id, 'for child: ', commentData.Parent);
+                function isSameId(element){
+                  return element._id === commentData.uuid;
+                }
+                const replyIndex = comment.Replies.findIndex(isSameId);
+                if(replyIndex !== -1 ){
+                  comment.Replies.splice(replyIndex,1);
+                }else{
+                  console.log('hs deleteRep Server Error: Could not find this reply in the parents list');
+                }
+            }
+          });
+        }else {
+          if (commentData.uuid && userLessonQueryCommentsID.includes(commentData.uuid)) {
+            userLessonQueryResult.Comments.pull(commentData.uuid);
+            console.log('hs DelCom removed: ', commentData.Text);
+          } else {
+            throw new Error();
+          }
         }
       }
       await userLessonQueryResult.save();

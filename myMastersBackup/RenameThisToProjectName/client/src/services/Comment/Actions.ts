@@ -97,13 +97,14 @@ export const onCommentEditText = (commentUuid, commentStartTime, commentEndTime,
   });
 };
 
-export const onCommentDeleteText = (commentUuid, commentStartTime, commentEndTime, commentText) => (dispatch) => {
+export const onCommentDeleteText = (commentUuid, commentStartTime, commentEndTime, commentText, parent) => (dispatch) => {
   dispatch({
     type: actions.COMMENT_DELETE_TEXT,
     uuid: commentUuid,
     startTime: (commentStartTime < commentEndTime) ? commentStartTime : commentEndTime,
     endTime: (commentStartTime < commentEndTime) ? commentEndTime : commentStartTime,
     Text: commentText,
+    Parent: parent,
   });
 };
 

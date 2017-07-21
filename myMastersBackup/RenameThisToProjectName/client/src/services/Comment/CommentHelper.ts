@@ -18,7 +18,6 @@ export const commentNormalize = (comments: Array<IComment>) => {
       Text: comment.Text,
       Parent: comment.Parent,
       Replies: comment.Replies,
-      //Replies: [],
     });
   });
   return result;
@@ -91,33 +90,34 @@ export const updateCommentStateWithCommentRemove = (oldComments, newComment) => 
   function isSameId(element){
     return element._id === newComment.uuid;
   }
+  function isSameParentId(element){
+    return element._id === newComment.Parent;
+  }
 
-  const targetIndex = oldComments.findIndex(isSameId);
+  if(newComment.Parent){
 
-  if ( targetIndex !== -1){
-    oldComments.splice(targetIndex, 1);
+    const parentIndex = oldComments.findIndex(isSameParentId);
+
+    if ( parentIndex !== -1){
+      const replyIndex = oldComments[parentIndex].Replies.findIndex(isSameId);
+      if(replyIndex !== -1 ){
+        oldComments[parentIndex].Replies.splice(replyIndex,1);
+      }else{
+        console.log('hs Error: Could not find this reply in the parents list');
+      }
+    }else{
+      console.log('hs Error: Could not find the parent of this reply');
+    }
+
+  }else{
+    const targetIndex = oldComments.findIndex(isSameId);
+
+    if ( targetIndex !== -1){
+      oldComments.splice(targetIndex, 1);
+    }
   }
 
   return oldComments;
-};
-
-
-export const commentGenerateRemoveDiff = (newComments,idOfDeleted, preComments, color) => {
-  const commentUpdate = {
-    remove: [],
-    create: [],
-    edit:   [],
-  };
-  /*const preUUID = new Set(preComments.map((comment) => {
-    return comment._id;
-  }));*/
-  const preUUID = new Set();
-  if(idOfDeleted){
-    preUUID.add(idOfDeleted);
-  }
-  
-  commentUpdate.remove = Array.from(preUUID);
-  return [idOfDeleted, commentUpdate];
 };
 
 

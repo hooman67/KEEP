@@ -16,7 +16,6 @@ import {
  
   getComments,
   postComments,
-  replyComments,
   deleteComments,
   editComments,
  
@@ -81,10 +80,9 @@ router.route('/lesson/:lessonID/comments')
 
 router.route('/lesson/:lessonID/comments')
   .post(generalAuth, lessonWildAccess, lessonSubscriberAccess, userLessonSubscriberAccess, postComments);
+
 router.route('/lesson/:lessonID/comments/edit')
   .post(generalAuth, lessonWildAccess, lessonSubscriberAccess, userLessonSubscriberAccess, editComments);
-router.route('/lesson/:lessonID/comments/reply')
-  .post(generalAuth, lessonWildAccess, lessonSubscriberAccess, userLessonSubscriberAccess, replyComments);
 
 router.route('/lesson/:lessonID/comments')
   .delete(generalAuth, lessonWildAccess, lessonSubscriberAccess, userLessonSubscriberAccess, deleteComments);

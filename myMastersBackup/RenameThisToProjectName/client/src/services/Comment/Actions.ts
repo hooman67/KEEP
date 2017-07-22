@@ -87,13 +87,14 @@ export const onCommentSendText = (commentUuid, commentStartTime, commentEndTime,
   });
 };
 
-export const onCommentEditText = (commentUuid, commentStartTime, commentEndTime, commentText) => (dispatch) => {
+export const onCommentEditText = (commentUuid, commentStartTime, commentEndTime, commentText, parent) => (dispatch) => {
   dispatch({
     type: actions.COMMENT_EDIT_TEXT,
     uuid: commentUuid,
     startTime: (commentStartTime < commentEndTime) ? commentStartTime : commentEndTime,
     endTime: (commentStartTime < commentEndTime) ? commentEndTime : commentStartTime,
     Text: commentText,
+    Parent: parent,
   });
 };
 

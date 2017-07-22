@@ -6,11 +6,10 @@ import {
   updateCommentStateWithReplyAndText,
   updateCommentStateWithReply,
   updateCommentStateWithCommentRemove,
-  commentRemoveSingleColor,
-  commentRemoveAllColor,
 } from './CommentHelper';
 
 const INITIAL_STATE = {
+  updateComment:false,
   commentData: null,
   cachedCommentData: null,
   removeMultiColorComments: false,
@@ -81,29 +80,18 @@ export default (state = INITIAL_STATE, action) => {
 
 
     case actions.COMMENT_EDIT_TEXT:
-       const editTextUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+      state.updateComment = true;
+      
+      if(action.Parent){
+        console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
+          
+        const [editTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
           uuid: action.uuid,
           start: action.startTime,
           end: action.endTime,
           Text: action.Text,
+          Parent: action.Parent,
         });
-
-
-        const editTextCommentUpdate = {
-          remove: [],
-          create: [],
-          edit:   [],
-        };
-
-        editTextCommentUpdate.edit.push({
-          _id: action.uuid,
-          TimeRange: {
-            start: action.startTime,
-            end: action.endTime,
-          },
-          Color: state.activeCommentColor,
-          Text: action.Text,
-        });;
 
         return {
           ...state,
@@ -111,8 +99,36 @@ export default (state = INITIAL_STATE, action) => {
             ...state.commentData,
             [state.activeCommentColor]: editTextUpdatedComments,
           },
-          commentUpdate: editTextCommentUpdate,
+          commentUpdate: {
+            remove: [],
+            create: [],
+            edit:   [],
+          },
         };
+
+      }else{
+        const editTextUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+          uuid: action.uuid,
+          start: action.startTime,
+          end: action.endTime,
+          Text: action.Text,
+          Parent: action.Parent,
+        });
+
+        return {
+          ...state,
+          commentData: {
+            ...state.commentData,
+            [state.activeCommentColor]: editTextUpdatedComments,
+          },
+          commentUpdate: {
+            remove: [],
+            create: [],
+            edit:   [],
+          },
+        };
+
+      }
 
 
 
@@ -135,17 +151,32 @@ export default (state = INITIAL_STATE, action) => {
             Parent: action.Parent,
           });
 
-          //HS add the comment to comments
-          commentUpdateSendText.create.push({
-            _id: action.uuid,
-            TimeRange: {
-              start: action.startTime,
-              end: action.endTime,
-            },
-            Color: state.activeCommentColor,
-            Text: action.Text,
-            Parent: action.Parent,
-          });
+          if(state.updateComment){
+            state.updateComment = false;
+
+            commentUpdateSendText.edit.push({
+              _id: action.uuid,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+          }else {
+            //HS add the comment to comments
+            commentUpdateSendText.create.push({
+              _id: action.uuid,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+          }
 
           return {
             ...state,
@@ -165,17 +196,34 @@ export default (state = INITIAL_STATE, action) => {
             Parent: action.Parent,
           });
 
-          //HS add the comment
-          commentUpdateSendText.create.push({
-            _id: action.uuid,
-            TimeRange: {
-              start: action.startTime,
-              end: action.endTime,
-            },
-            Color: state.activeCommentColor,
-            Text: action.Text,
-            Parent: action.Parent,
-          });
+          if(state.updateComment){
+            state.updateComment = false;
+
+            commentUpdateSendText.edit.push({
+              _id: action.uuid,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+
+          }else{
+            //HS add the comment
+            commentUpdateSendText.create.push({
+              _id: action.uuid,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+
+          }
 
           return {
             ...state,

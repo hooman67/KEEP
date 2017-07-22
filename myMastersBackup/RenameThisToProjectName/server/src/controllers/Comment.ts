@@ -15,9 +15,7 @@ export const deleteComments = async (req, res) => {
   const userLessonQueryCommentsID = userLessonQueryResult.Comments.map((comment) => {
     return comment._id;
   });
-  /*const userLessonQueryCommentsParentID = userLessonQueryResult.Comments.map((comment) => {
-    return comment.Parent;
-  });*/
+
   if (req.body.Comments) {
     try {
       for (const commentData of req.body.Comments) {
@@ -112,30 +110,61 @@ export const postComments = async (req, res) => {
 };
 
 
-export const replyComments = async (req, res) => {
-  console.log('hs replyComments controller called\n');
+export const editComments = async (req, res) => {
+  console.log('hs editComments controller called\n');
+  
   const  userLessonQueryResult: IUserLessonSchema = req.middleware.userLessonQueryResult;
+
   if (req.body.Comments) {
-    console.log('hsDebServ conrollers/Comments.ts replyComments req.body.comments:\n', req.body.Comments);
-    try {
+    
+    try { 
       for (const commentData of req.body.Comments) {
-        if (commentData._id) {
-          console.log("SS pushing to server reply");
-          console.log("hs query.comments reply:\n", userLessonQueryResult.Comments)
-          //userLessonQueryResult.Comments.push(commentData);
-        } else {
-          throw new Error();
+        
+        console.log('hs EditComent req.body.Comments: ', req.body.Comments);
+        if(commentData.Parent){
+          
+          console.log('hs EditComentReply sawReply data:\n', commentData);
+          userLessonQueryResult.Comments.forEach(function(comment){
+            
+            if(comment._id === commentData.Parent){
+              
+              console.log('hs EditComentReply found parent: ',
+              commentData.Parent, 'for child: ', commentData._id);
+              
+              function isSameId(element){
+                return element._id === commentData._id;
+              }
+
+              const replyIndex = comment.Replies.findIndex(isSameId);
+    
+              if(replyIndex !== -1 ){
+                console.log('hs EditComentReply found the reply. OldText: ',
+                    comment.Replies[replyIndex].Text, ' NewText: ', commentData.Text);
+
+                    //comment.Replies[replyIndex].Text = commentData.Text;
+                    //comment.Replies.splice(replyIndex,1);
+                    //comment.Replies.push(commentData);
+                    //comment.Replies[replyIndex] = commentData;
+                    comment.Replies.splice(replyIndex, 1, commentData);
+              }else{
+                console.log('hs EditComentReply Server Error: Could not find this reply in the parents list');
+              }
+            }
+          });
+        }else {
+          console.log('hs EditComent sawComment data:\n', commentData);
+          userLessonQueryResult.Comments.forEach(function(comment){
+            if(comment._id === commentData._id){
+              comment.Text = commentData.Text;
+            }
+          });
         }
       }
-      userLessonQueryResult.Comments.sort((a, b) => {
-        return (a.TimeRange.start - b.TimeRange.start);
-      });
       await userLessonQueryResult.save();
       sendJSONResponse(res, 200, {
         message: 'Action Complete',
       });
     } catch (e) {
-      console.log("hs:",e);
       sendJSONResponse(res, 500, {
         message: 'Internal Server Error',
       });
@@ -148,28 +177,37 @@ export const replyComments = async (req, res) => {
 };
 
 
-export const editComments = async (req, res) => {
+/*export const editComments = async (req, res) => {
   console.log('hs editComments controller called\n');
   const  userLessonQueryResult: IUserLessonSchema = req.middleware.userLessonQueryResult;
-    const userLessonQueryCommentsID = userLessonQueryResult.Comments.map((comment) => {
+  const userLessonQueryCommentsID = userLessonQueryResult.Comments.map((comment) => {
     return comment._id;
   });
   if (req.body.Comments) {
     console.log('hsDebServ conrollers/Comments.ts ln82(editComments) req.body.comments:\n', req.body.Comments);
     try {
       for (const commentData of req.body.Comments) {
-        if (commentData._id) {
-          /*console.log("SS pushing to server editComment");
-          console.log("hs (editComments) query.comments:\n", userLessonQueryResult.Comments)
-          userLessonQueryResult.Comments.set(commentData);*/
-          if (userLessonQueryCommentsID.includes(commentData._id)) {
-            userLessonQueryResult.Comments.pull(commentData._id);
+        if(commentData.Parent){
+          console.log("hs pushing to server editComment CHILD");
+          if (userLessonQueryCommentsID.includes(commentData.Parent)) {
+            console.log('hs userLessonQueryResult.Comments:\n',userLessonQueryCommentsID.findIndex(commentData.Parent));
           } else {
             throw new Error();
           }
-        } else {
-          throw new Error();
+        }else{
+          if (commentData._id) {
+     
+            if (userLessonQueryCommentsID.includes(commentData._id)) {
+              console.log("hs pushing to server editComment parent");
+              userLessonQueryResult.Comments.pull(commentData._id);
+            } else {
+              throw new Error();
+            }
+          } else {
+            throw new Error();
+          }
         }
+        
       }
       userLessonQueryResult.Comments.sort((a, b) => {
         return (a.TimeRange.start - b.TimeRange.start);
@@ -189,5 +227,5 @@ export const editComments = async (req, res) => {
       message: 'Action Complete',
     });
   }
-};
+};*/
 

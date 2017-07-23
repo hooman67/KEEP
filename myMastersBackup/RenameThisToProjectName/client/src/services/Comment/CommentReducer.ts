@@ -253,6 +253,7 @@ export default (state = INITIAL_STATE, action) => {
           const [commentsReplyWithUUID, parentComment] = updateCommentStateWithReply([...state.commentData[state.activeCommentColor]], {
             start: action.startTime,
             end: action.endTime,
+            Color: state.activeCommentColor,
             Text: action.Text,
             Parent: action.Parent,
           });

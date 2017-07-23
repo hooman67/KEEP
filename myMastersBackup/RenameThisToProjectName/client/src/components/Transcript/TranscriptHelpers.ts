@@ -300,6 +300,7 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
           _id:     commentData.red[i]._id,
           start:   commentData.red[i].start,
           end:     commentData.red[i].end,
+          Color: 'red',
           Text:    commentData.red[i].Text,
           Parent:  commentData.red[i].Parent,
           Replies: commentData.red[i].Replies,
@@ -307,37 +308,77 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
         
       }
     }
-   /* if (commentData && commentData.yellow) {
+
+
+    if (commentData && commentData.yellow) {
       for (i = 0; i < commentData.yellow.length; i += 1) {
         colorTimeStamps.startTime = commentData.yellow[i].start;
-        colorTimeStamps.endTime = commentData.yellow[i].end;
-        newTranscriptObj = handleSingleComment(transcriptObj, colorTimeStamps, 'yellow', true);
+
+        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+        const endTime = getClosestTimestamp(transcriptObj, commentData.yellow[i].end)[1];
+
+        /* get transcriptObj id for endTime*/
+        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+  
+
+        newTranscriptObj[endId].comments.push({
+          _id:     commentData.yellow[i]._id,
+          start:   commentData.yellow[i].start,
+          end:     commentData.yellow[i].end,
+          Color: 'yellow',
+          Text:    commentData.yellow[i].Text,
+          Parent:  commentData.yellow[i].Parent,
+          Replies: commentData.yellow[i].Replies,
+        });
       }
     }
+
+
     if (commentData && commentData.blue) {
       for (i = 0; i < commentData.blue.length; i += 1) {
         colorTimeStamps.startTime = commentData.blue[i].start;
-        colorTimeStamps.endTime = commentData.blue[i].end;
-        newTranscriptObj = handleSingleComment(transcriptObj, colorTimeStamps, 'blue', true);
+
+        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+        const endTime = getClosestTimestamp(transcriptObj, commentData.blue[i].end)[1];
+
+        /* get transcriptObj id for endTime*/
+        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+  
+
+        newTranscriptObj[endId].comments.push({
+          _id:     commentData.blue[i]._id,
+          start:   commentData.blue[i].start,
+          end:     commentData.blue[i].end,
+          Color: 'blue',
+          Text:    commentData.blue[i].Text,
+          Parent:  commentData.blue[i].Parent,
+          Replies: commentData.blue[i].Replies,
+        });
       }
     }
     if (commentData && commentData.green) {
       for (i = 0; i < commentData.green.length; i += 1) {
         colorTimeStamps.startTime = commentData.green[i].start;
-        colorTimeStamps.endTime = commentData.green[i].end;
-        newTranscriptObj = handleSingleComment(transcriptObj, colorTimeStamps, 'green', true);
+
+        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+        const endTime = getClosestTimestamp(transcriptObj, commentData.green[i].end)[1];
+
+        /* get transcriptObj id for endTime*/
+        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+  
+
+        newTranscriptObj[endId].comments.push({
+          _id:     commentData.green[i]._id,
+          start:   commentData.green[i].start,
+          end:     commentData.green[i].end,
+          Color: 'green',
+          Text:    commentData.green[i].Text,
+          Parent:  commentData.green[i].Parent,
+          Replies: commentData.green[i].Replies,
+        });
       }
     }
-    if (commentData && commentData.purple) {
-      for (i = 0; i < commentData.purple.length; i += 1) {
-        colorTimeStamps.startTime = commentData.purple[i].start;
-        colorTimeStamps.endTime = commentData.purple[i].end;
-        newTranscriptObj = handleSingleComment(transcriptObj, colorTimeStamps, 'purple', true);
-      }
-    }*/
-
-
-
+    
   return newTranscriptObj;
 }
 /* Creates a div with styles and fonts to check width */

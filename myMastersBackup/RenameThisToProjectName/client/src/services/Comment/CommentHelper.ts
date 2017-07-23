@@ -15,6 +15,7 @@ export const commentNormalize = (comments: Array<IComment>) => {
       _id: comment._id,
       start: comment.TimeRange.start,
       end: comment.TimeRange.end,
+      Color: comment.Color,
       Text: comment.Text,
       Parent: comment.Parent,
       Replies: comment.Replies,

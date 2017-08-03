@@ -66,9 +66,9 @@ export const onCommentSelectSectionStart = ActionCreator<IAction>(actions.COMMEN
 
 export const onCommentSelectSectionInProcess = ActionCreator<IAction>(actions.COMMENT_SELECT_SECTION_IN_PROGRESS, 'selectSectionEndTime');
 
-export const onCommentSelectSectionEnd = (parentUuid, selectSectionStartTime, selectSectionEndTime) => (dispatch) => {
+export const onCommentSelectSectionEndFS = (parentUuid, selectSectionStartTime, selectSectionEndTime) => (dispatch) => {
   dispatch({
-    type: actions.COMMENT_SEND_SELECTION,
+    type: actions.COMMENT_SELECT_SECTION_END_FS,
     startTime: (selectSectionStartTime < selectSectionEndTime) ? selectSectionStartTime : selectSectionEndTime,
     endTime: (selectSectionStartTime < selectSectionEndTime) ? selectSectionEndTime : selectSectionStartTime,
     Text: '',
@@ -76,12 +76,36 @@ export const onCommentSelectSectionEnd = (parentUuid, selectSectionStartTime, se
   });
 };
 
-export const onCommentSendText = (commentUuid, commentStartTime, commentEndTime, commentText, parentUuid) => (dispatch) => {
+export const onCommentSelectSectionEnd = (parentUuid, selectSectionStartTime, selectSectionEndTime, forceComment) => (dispatch) => {
+  dispatch({
+    type: actions.COMMENT_SEND_SELECTION,
+    startTime: (selectSectionStartTime < selectSectionEndTime) ? selectSectionStartTime : selectSectionEndTime,
+    endTime: (selectSectionStartTime < selectSectionEndTime) ? selectSectionEndTime : selectSectionStartTime,
+    Text: '',
+    Parent: parentUuid,
+    ForceComment: forceComment,
+  });
+};
+
+export const onCommentSendText = (commentUuid, commentStartTime, commentEndTime, commentText, parentUuid, timeStamp) => (dispatch) => {
   dispatch({
     type: actions.COMMENT_SEND_TEXT,
     uuid: commentUuid,
     startTime: (commentStartTime < commentEndTime) ? commentStartTime : commentEndTime,
     endTime: (commentStartTime < commentEndTime) ? commentEndTime : commentStartTime,
+    TimeStamp: timeStamp,
+    Text: commentText,
+    Parent: parentUuid,
+  });
+};
+
+export const onCommentSendFilmStripText = (commentUuid, commentStartTime, commentEndTime, commentText, parentUuid, timeStamp) => (dispatch) => {
+  dispatch({
+    type: actions.COMMENT_SEND_FIlM_STRIP_TEXT,
+    uuid: commentUuid,
+    startTime: (commentStartTime < commentEndTime) ? commentStartTime : commentEndTime,
+    endTime: (commentStartTime < commentEndTime) ? commentEndTime : commentStartTime,
+    TimeStamp: timeStamp,
     Text: commentText,
     Parent: parentUuid,
   });
@@ -127,6 +151,8 @@ export const onCommentSelectSectionClear = ActionCreator<IAction>(actions.COMMEN
 
 export const onCommentColorSelection = ActionCreator<IAction>(actions.COMMENT_SELECT_COLOR, 'color');
 
+export const onCommentModeChange = ActionCreator<IAction>(actions.COMMENT_MODE_CHANGE, 'mode');
+
 export const onCommentRemoveOff = ActionCreator<IAction>(actions.COMMENT_REMOVE_OFF);
 
 export const onCommentToggleMultipleCommentRemoval = ActionCreator<IAction>(actions.COMMENT_REMOVE_MULTIPLE);
@@ -134,3 +160,24 @@ export const onCommentToggleMultipleCommentRemoval = ActionCreator<IAction>(acti
 export const onCommentSetCommentRemove = ActionCreator<IAction>(actions.COMMENT_REMOVE_ENABLE);
 
 export const onCommentHover = ActionCreator<IAction>(actions.COMMENT_HOVER);
+
+export const onCommentViewMoreTrue = ActionCreator<IAction>(actions.COMMENT_VIEW_MORE, 'commentID');
+export const onCommentViewMoreFalse = ActionCreator<IAction>(actions.COMMENT_VIEW_MORE_FALSE);
+
+export const onCommentExpandAll = ActionCreator<IAction>(actions.COMMENT_EXPAND_ALL);
+
+export const editCommentFilmStrip = (commentUuid, commentStartTime, commentEndTime, commentText, parentUuid, timeStamp, color) => (dispatch) => {
+  dispatch({
+    type: actions.COMMENT_FILMSTRIP_EDIT_TOGGLE,
+    uuid: commentUuid,
+    startTime: commentStartTime,
+    endTime: commentEndTime,
+    TimeStamp: timeStamp,
+    Text: commentText,
+    Parent: parentUuid,
+    Color: color,
+  });
+};
+
+
+export const cancelCommentEditFilmstrip = ActionCreator<IAction>(actions.COMMENT_FILMSTRIP_CANCEL_EDIT_TOGGLE);

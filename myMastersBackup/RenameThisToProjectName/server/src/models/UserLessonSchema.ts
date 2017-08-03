@@ -30,6 +30,10 @@ const commentSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  TimeStamp: {
+    type: String,
+    required: true,
+  },
   Color: {
     type: String,
     required: true,
@@ -133,7 +137,7 @@ userLessonSchema.pre('validate', function (next) {
   });
   const newCommentsID = this.Comments.map((comment) => {
     if (validator.isUUID(comment._id)) {
-       console.log('hsDebServ UserLessonSchema.ts passed 132');
+      //  console.log('hsDebServ UserLessonSchema.ts passed 132');
       return comment._id;
     } else {
       next(new Error());
@@ -153,7 +157,7 @@ userLessonSchema.pre('validate', function (next) {
   if ((newHighlightsIDSet.size !== newHighlightsID.length) || (newNotesIDSet.size !== newNotesID.length) || (newCommentsIDSet.size !== newCommentsID.length)) {
     next(new Error());
   }
-   console.log('hsDebServ UserLessonSchema.ts passed 152');
+  //  console.log('hsDebServ UserLessonSchema.ts passed 152');
   next();
 });
 

@@ -15,12 +15,15 @@ export interface ICommentCore {
   onVideoPlayerPlayCommentClick: Function;
   className: string;
   onCommentHover: Function;
+  editCommentFilmStrip: Function;
+  cancelCommentEditFilmstrip: Function;
+  onCommentViewMoreTrue: any;
 }
 
 export interface ICommentProps{
   comments: IComment[];
   className: string;
-  onCommentSendText: Function;
+  onCommentSendFilmStripText: Function;
 }
 
 export interface ICommentData {
@@ -30,10 +33,13 @@ export interface ICommentData {
   width: number;
   height: number;
   fill: string;
+  showTimeRange: boolean,
   onClickData: {
+    _id: string,
     start: number,
     end: number,
     Text: string,
+    Parent: string,
+    TimeStamp: string,
   };
 }
-

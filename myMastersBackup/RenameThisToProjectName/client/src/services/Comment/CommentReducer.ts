@@ -11,10 +11,13 @@ import {
 const INITIAL_STATE = {
   updateComment:false,
   commentData: null,
+  colorPickerData: null,
+  colorPickerDisplay: false,
   cachedCommentData: null,
   removeMultiColorComments: false,
   removeComment: false,
-  activeCommentColor: null,
+  activeCommentColor: 'green',
+  commentingMode: false,
   // communicate with database
   commentUpdate: {
     remove: null,
@@ -26,6 +29,9 @@ const INITIAL_STATE = {
     selectSectionEndTime: null,
     status: 'free',
   },
+  commentViewMore: false,
+  commentViewMoreId: null,
+  commentExpandAll: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -52,6 +58,12 @@ export default (state = INITIAL_STATE, action) => {
         activeCommentColor: action.color,
       };
 
+    case actions.COMMENT_MODE_CHANGE:
+      return {
+        ...state,
+        commentingMode: action.mode,
+      };
+
     case actions.COMMENT_DELETE_TEXT:
       const commentToBeDeleted = {
         uuid: action.uuid,
@@ -60,7 +72,7 @@ export default (state = INITIAL_STATE, action) => {
         Text: action.Text,
         Parent: action.Parent,
       };
-      
+
       const deleteTextUpdatedComments = updateCommentStateWithCommentRemove([...state.commentData[state.activeCommentColor]], commentToBeDeleted);
 
       const commentUpdateDeleteText = {
@@ -81,10 +93,10 @@ export default (state = INITIAL_STATE, action) => {
 
     case actions.COMMENT_EDIT_TEXT:
       state.updateComment = true;
-      
+
       if(action.Parent){
         console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
-          
+
         const [editTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
           uuid: action.uuid,
           start: action.startTime,
@@ -132,8 +144,8 @@ export default (state = INITIAL_STATE, action) => {
 
 
 
-    case actions.COMMENT_SEND_TEXT:
-        const commentUpdateSendText = {
+    case actions.COMMENT_SEND_FIlM_STRIP_TEXT:
+        const commentUpdateSendTextFilmStrip = {
           remove: [],
           create: [],
           edit:   [],
@@ -142,8 +154,8 @@ export default (state = INITIAL_STATE, action) => {
 
         if(action.Parent){
           console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
-          
-          const [sendTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
+
+         /* const [sendTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
             uuid: action.uuid,
             start: action.startTime,
             end: action.endTime,
@@ -185,13 +197,78 @@ export default (state = INITIAL_STATE, action) => {
               [state.activeCommentColor]: sendTextUpdatedComments,
             },
             commentUpdate: commentUpdateSendText,
-          };
+          };*/
 
         }else{
-          const sendTextUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+          const sendTextFilmStripUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
             uuid: action.uuid,
             start: action.startTime,
             end: action.endTime,
+            TimeStamp: action.TimeStamp,
+            Text: action.Text,
+            Parent: action.Parent,
+          });
+
+          if(state.updateComment){
+            state.updateComment = false;
+
+            commentUpdateSendTextFilmStrip.edit.push({
+              _id: action.uuid,
+              TimeStamp: action.TimeStamp,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+
+          }else{
+            //HS add the comment
+            commentUpdateSendTextFilmStrip.create.push({
+              _id: action.uuid,
+              TimeStamp: action.TimeStamp,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+
+          }
+
+          return {
+            ...state,
+            commentData: {
+              ...state.commentData,
+              [state.activeCommentColor]: sendTextFilmStripUpdatedComments,
+            },
+            colorPickerData: null,
+            colorPickerDisplay: false,
+            commentUpdate: commentUpdateSendTextFilmStrip,
+          };
+        }
+
+
+    case actions.COMMENT_SEND_TEXT:
+        const commentUpdateSendText = {
+          remove: [],
+          create: [],
+          edit:   [],
+        };
+
+
+        if(action.Parent){
+          console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
+
+          const [sendTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
+            uuid: action.uuid,
+            start: action.startTime,
+            end: action.endTime,
+            TimeStamp: action.TimeStamp,
             Text: action.Text,
             Parent: action.Parent,
           });
@@ -201,6 +278,55 @@ export default (state = INITIAL_STATE, action) => {
 
             commentUpdateSendText.edit.push({
               _id: action.uuid,
+              TimeStamp: action.TimeStamp,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+          }else {
+            //HS add the comment to comments
+            commentUpdateSendText.create.push({
+              _id: action.uuid,
+              TimeStamp: action.TimeStamp,
+              TimeRange: {
+                start: action.startTime,
+                end: action.endTime,
+              },
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              Parent: action.Parent,
+            });
+          }
+
+          return {
+            ...state,
+            commentData: {
+              ...state.commentData,
+              [state.activeCommentColor]: sendTextUpdatedComments,
+            },
+            commentUpdate: commentUpdateSendText,
+          };
+
+        }else{
+          const sendTextUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+            uuid: action.uuid,
+            start: action.startTime,
+            end: action.endTime,
+            TimeStamp: action.TimeStamp,
+            Text: action.Text,
+            Parent: action.Parent,
+          });
+
+          if(state.updateComment){
+            state.updateComment = false;
+
+            commentUpdateSendText.edit.push({
+              _id: action.uuid,
+              TimeStamp: action.TimeStamp,
               TimeRange: {
                 start: action.startTime,
                 end: action.endTime,
@@ -214,6 +340,7 @@ export default (state = INITIAL_STATE, action) => {
             //HS add the comment
             commentUpdateSendText.create.push({
               _id: action.uuid,
+              TimeStamp: action.TimeStamp,
               TimeRange: {
                 start: action.startTime,
                 end: action.endTime,
@@ -238,8 +365,6 @@ export default (state = INITIAL_STATE, action) => {
 
 
 
-
-    // TODO: Clean Up Code
     case actions.COMMENT_SEND_SELECTION:
       const selectSection = {
         selectSectionStartTime: action.startTime,
@@ -247,12 +372,16 @@ export default (state = INITIAL_STATE, action) => {
         status: 'end',
       };
 
-      if (state.activeCommentColor) {
+      if (state.commentingMode || action.ForceComment) {
+
+        const timeTemp = ((new Date()).getTime()*1000);
+        const currentTime = (new Date(timeTemp)).toString();
 
         if(action.Parent){
           const [commentsReplyWithUUID, parentComment] = updateCommentStateWithReply([...state.commentData[state.activeCommentColor]], {
             start: action.startTime,
             end: action.endTime,
+            TimeStamp: currentTime,
             Color: state.activeCommentColor,
             Text: action.Text,
             Parent: action.Parent,
@@ -275,12 +404,14 @@ export default (state = INITIAL_STATE, action) => {
           const mergedComment = [...state.commentData[state.activeCommentColor], {
             start: action.startTime,
             end: action.endTime,
+            TimeStamp: currentTime,
+            Color: state.activeCommentColor,
             Text: action.Text,
             Parent: action.Parent,
           }];
 
           const [commentsWithUUID, commentUpdate] = commentGenerateDiff(mergedComment, state.commentData[state.activeCommentColor], state.activeCommentColor);
-          
+
           return {
             ...state,
             commentData: {
@@ -302,6 +433,63 @@ export default (state = INITIAL_STATE, action) => {
           selectSection,
         };
       }
+
+
+
+      case actions.COMMENT_SELECT_SECTION_END_FS:
+        const selectSectionComplete ={
+            selectSectionEndTime: action.startTime,
+            selectSectionStartTime: action.endTime,
+            status: 'end',
+        }
+
+        if(state.commentingMode){
+          const timeTempFS = ((new Date()).getTime()*1000);
+          const currentTimeFS = (new Date(timeTempFS)).toString();
+
+          if(action.Parent){
+            //do for reply
+          }else{
+            //no reply
+              const mergedCommentFS = [...state.commentData[state.activeCommentColor], {
+              start: action.startTime,
+              end: action.endTime,
+              Color: state.activeCommentColor,
+              Text: action.Text,
+              TimeStamp: currentTimeFS,
+              Parent: action.Parent,
+            }];
+
+              const [commentsWithUUIDFS, commentUpdateFS] = commentGenerateDiff(mergedCommentFS, state.commentData[state.activeCommentColor], state.activeCommentColor);
+
+              const updateColorPickerData = commentUpdateFS.create[0];
+              console.log("Update Color Picker Data", updateColorPickerData);
+              return {
+              ...state,
+              commentData: {
+                ...state.commentData,
+                [state.activeCommentColor]: commentsWithUUIDFS,
+              },
+              colorPickerData: updateColorPickerData,
+              colorPickerDisplay: true,
+              commentUpdate:{
+                remove: [],
+                create: [],
+                edit:   [],
+              },
+              selectSection: selectSectionComplete,
+              };
+
+            }
+
+        }else{
+          return{
+            ...state,
+            selectSection: selectSectionComplete,
+            colorPickerDisplay: true,
+          }
+        }
+
 
     case actions.COMMENT_REMOVE_OFF:
       return {
@@ -372,8 +560,114 @@ export default (state = INITIAL_STATE, action) => {
     case actions.COMMENT_HOVER:
       console.log("COMMENT HOVER IN COMMENT REDUCER");
       console.log(state.commentData);
-      
-      return state;
+
+    case actions.COMMENT_FILMSTRIP_EDIT_TOGGLE:
+      state.updateComment = true;
+
+      if(action.Parent){
+        console.log('ss updating parent: ', action.Parent, 'for', action.uuid);
+
+        const [editTextUpdatedCommentsFS, parentCommentFS2] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
+          uuid: action.uuid,
+          start: action.startTime,
+          end: action.endTime,
+          Text: action.Text,
+          Parent: action.Parent,
+          TimeStamp: action.TimeStamp,
+        });
+            return{
+          ...state,
+          commentData: {
+            ...state.commentData,
+              [state.activeCommentColor]: editTextUpdatedCommentsFS,
+            },
+          colorPickerDisplay: true,
+            colorPickerData:  {
+              _id: action.uuid,
+            TimeStamp: action.TimeStamp,
+            TimeRange: {
+              start: action.startTime,
+              end: action.endTime,
+            },
+            Color: action.Color,
+            Text: action.Text,
+            Parent: action.Parent,
+            },
+          commentUpdate:{
+            remove:[],
+            create: [],
+            edit: [],
+          }
+
+        }
+
+      }else{
+          const editTextUpdatedCommentsFS = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+          uuid: action.uuid,
+          start: action.startTime,
+          end: action.endTime,
+          Text: action.Text,
+          Parent: action.Parent,
+        });
+
+        return{
+          ...state,
+          commentData:{
+            ...state.commentData,
+            [state.activeCommentColor]: editTextUpdatedCommentsFS,
+          },
+          commentUpdate:{
+            remove: [],
+            create: [],
+            edit: [],
+          },
+          colorPickerDisplay: true,
+          colorPickerData:  {
+            _id: action.uuid,
+          TimeStamp: action.TimeStamp,
+          TimeRange: {
+            start: action.startTime,
+            end: action.endTime,
+          },
+          Color: action.Color,
+          Text: action.Text,
+          Parent: action.Parent,
+          },
+        }
+      }
+
+
+    case actions.COMMENT_VIEW_MORE:
+        return {
+          ...state,
+          commentViewMore: true,
+          commentViewMoreId: action.commentID
+        };
+
+
+    case actions.COMMENT_VIEW_MORE_FALSE:
+        return {
+          ...state,
+          commentViewMore: false,
+          commentViewMoreId: action.commentID
+        };
+
+
+    case actions.COMMENT_EXPAND_ALL:
+          return {
+            ...state,
+            commentExpandAll: !state.commentExpandAll,
+          };
+
+
+    case actions.COMMENT_FILMSTRIP_CANCEL_EDIT_TOGGLE:
+          return{
+            ...state,
+            colorPickerData: null,
+            colorPickerDisplay: false
+          }
+
+
 
     default:
       return state;

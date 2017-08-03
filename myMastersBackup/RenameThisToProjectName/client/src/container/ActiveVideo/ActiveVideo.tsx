@@ -35,6 +35,7 @@ import styles from './styles.css';
 import SideBar from '../../components/SideBar/SideBar';
 import SideBarOverlay from '../../components/SideBar/SideBarOverlay';
 
+
 class ActiveVideo extends Component<any, any> {
   componentWillMount () {
     this.props.onActiveVideoInit(this.props.params.id);
@@ -58,7 +59,7 @@ class ActiveVideo extends Component<any, any> {
 
   render () {
     const dSize = this.props.isOpen ? '308px' : '0px';
-    const sSize = this.props.isOpen ? null : '0%';
+    const sSize = this.props.comment.commentViewMore ? '308px' : '0px';
     const rSize: boolean = this.props.isOpen ? true : false;
 
                             return (
@@ -69,19 +70,13 @@ class ActiveVideo extends Component<any, any> {
                                         </div>
 
                                         <div className={styles.content}>
-                                          <SplitPane split='vertical' size = {dSize} maxSize = {dSize} >
-                                            <div>
-                                              <SideBarOverlay />
-
-                                            </div>
-                                            <SplitPane split="vertical" defaultSize="50%">
-                                              <SplitPane split='horizontal' defaultSize='70%' className='primary'>
+                                            <SplitPane split="vertical" defaultSize="60%" className='primary' pane2Style={{ overflowY: 'auto' }}>
+                                              <SplitPane split='horizontal' defaultSize='70%' className='primary' >
                                                 <VideoPlayer />
                                                 <Filmstrip />
                                               </SplitPane>
-                                              <Transcript currentTime={this.props.currentTime} />
+                                              <SideBarOverlay />
                                             </SplitPane>
-                                          </SplitPane>
                                           </div>
                                         </div>
 

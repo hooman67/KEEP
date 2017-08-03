@@ -12,7 +12,8 @@ const INITIAL_STATE = {
   cachedHighlightData: null,
   removeMultiColorHighlights: false,
   removeHighLight: false,
-  activeHighlightColor: null,
+  activeHighlightColor: 'red',
+  highlightingMode: false,
   // communicate with database
   highlightUpdate: {
     remove: null,
@@ -46,6 +47,12 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         activeHighlightColor: action.color,
+      };
+
+    case actions.HIGHLIGHT_MODE_CHANGE:
+      return {
+        ...state,
+        highlightingMode: action.mode,
       };
 
     // TODO: Clean Up Code
@@ -82,7 +89,7 @@ export default (state = INITIAL_STATE, action) => {
           selectSection,
         };
       }
-      if (state.activeHighlightColor) {
+      if (state.highlightingMode) {
         if (state.removeHighLight) {
           const removedHighlights = highlightRemoveSingleColor([...state.highlightData[state.activeHighlightColor]], {
             start: action.startTime,

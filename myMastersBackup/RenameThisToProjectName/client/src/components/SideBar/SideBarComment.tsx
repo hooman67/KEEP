@@ -11,11 +11,7 @@ render () {
 
   if(this.props.comment.commentData)
   {
-      if((this.props.comment.commentData.red && this.props.comment.commentData.red.length > 0  )||
-         (this.props.comment.commentData.blue && this.props.comment.commentData.blue.length > 0 )||
-         (this.props.comment.commentData.green && this.props.comment.commentData.green.lenth > 0 )||
-         (this.props.comment.commentData.yellow && this.props.comment.commentData.yellow.length > 0 )||
-         (this.props.comment.commentData.purple && this.props.comment.commentData.purple.length > 0))
+      if((this.props.comment.commentData.red && (this.props.comment.commentData.red.length > 0)  ) || (this.props.comment.commentData.blue && (this.props.comment.commentData.blue.length > 0) )|| (this.props.comment.commentData.green && (this.props.comment.commentData.green.length > 0) ) || (this.props.comment.commentData.yellow && (this.props.comment.commentData.yellow.length > 0) )||  (this.props.comment.commentData.purple && (this.props.comment.commentData.purple.length > 0) ))
 
               {
                         const dSize = this.props.isOpen ? '300px' : '0px';
@@ -36,48 +32,64 @@ render () {
                         let i;
 
 
-                        if (this.props.comment.commentData.red[0] != null)
+                        if (this.props.comment.commentData.red && this.props.comment.commentData.red.length > 0)
                         {
                         listCommentsRed = this.props.comment.commentData.red.map(function(comments, index){
 
                                 return(
 
-                                  <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} commentStart = {comments.start} commentEnd = {comments.end} commentArr = {comments}/>
+                                  <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} Color = 'red' commentArr = {comments}/>
                                 )}
                               );
                             } else
                           {
-                            listCommentsRed = null;
+                            listCommentsRed = <span></span>;
                           };
 
 
                           if (this.props.comment.commentData.green[0] != null)
                           {
-                          listCommentsGreen = this.props.comment.commentData.green.map(function(comments){
+                          listCommentsGreen = this.props.comment.commentData.green.map(function(comments, index){
 
                                   return(
 
-                                    <p> {comments.text}</p>
+                                    <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} Color = 'green' commentArr = {comments}/>
                                   )}
                                 );
                               } else
                             {
-                              listCommentsGreen = null;
+                              listCommentsGreen = <span></span>;
                             };
 
                             if (this.props.comment.commentData.yellow[0] != null)
                             {
-                            listCommentsYellow = this.props.comment.commentData.yellow.map(function(comments){
+                            listCommentsYellow = this.props.comment.commentData.yellow.map(function(comments, index){
 
                                     return(
 
-                                      <p> {comments.text}</p>
+                                      <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} Color = 'yellow' commentArr = {comments}/>
+
                                     )}
                                   );
                                 } else
                               {
-                                listCommentsYellow = null;
+                                listCommentsYellow = <span></span>;
                               };
+
+                              if (this.props.comment.commentData.blue[0] != null)
+                              {
+                              listCommentsBlue = this.props.comment.commentData.blue.map(function(comments, index){
+
+                                      return(
+
+                                        <SideBarCommentText text = {comments.Text} commentIndex = {index} commentID = {comments._id} Color = 'blue' commentArr = {comments}/>
+
+                                      )}
+                                    );
+                                  } else
+                                {
+                                  listCommentsBlue = <span></span>;
+                                };
 
 
                           const divStyleRed = { backgroundColor: '#ffcccc'};
@@ -90,10 +102,10 @@ render () {
                           return (
 
                                           <div>
-                                            <div style = {divStyleRed}> {listCommentsRed} </div>
-                                            <div style = {divStyleGreen}> {listCommentsGreen} </div>
-                                            <div style = {divStyleYellow}> {listCommentsYellow} </div>
-
+                                            <div > {listCommentsRed} </div>
+                                            <div > {listCommentsGreen} </div>
+                                            <div > {listCommentsYellow} </div>
+                                            <div > {listCommentsBlue} </div>
 
                                           </div>
 

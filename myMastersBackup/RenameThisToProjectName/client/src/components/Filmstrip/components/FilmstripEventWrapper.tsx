@@ -5,7 +5,7 @@ import ViewCountCore from './ViewCount/ViewCountCore';
 import IndicatorCore from './Indicator/IndicatorCore';
 import ThumbnailCore from './Thumbnail/ThumbnailCore';
 import CommentMapCore from './Comment/CommentCore';
-import CommentBoxMapCore from './Comment/CommentBoxCore';
+import uuid from 'uuid';
 import {
   TFilmstripActions,
   TFilmstripInputData,
@@ -38,21 +38,21 @@ export default class FilmstripEventWrap extends Component<any, any> {
     const cursorPosition: ICursorPosition = this.props.cursorPosition;
     // if filmstrip highlight select section action starts
     // it will process the cursor coordinates
-    // console.log(inputData.indicatorData.selectSectionDataComment.status);
-    if (inputData.indicatorData.selectSectionDataComment.status === 'start') {
-      console.log("Comment on Mouse move Handler");
+
+    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
+      if (inputData.indicatorData.selectSectionDataHighlight.status === 'start') {
+        actions.onHighlightSelectSectionInProcess(
+          pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+        );
+      }
+    }else if(inputData.activeCommentData != null && inputData.activeHighlightData == null){
+      if (inputData.indicatorData.selectSectionDataComment.status === 'start'){
+        actions.onCommentSelectSectionInProcess(
+          pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+        );
+      }
     }
-    // if (inputData.indicatorData.selectSectionDataHighlight.status === 'start') {
-    //   console.log("Highlgiht on mouse move handler");
-    //   actions.onHighlightSelectSectionInProcess(
-    //     pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
-    //   );
-    // }
-    if (inputData.indicatorData.selectSectionDataComment.status === 'start'){
-      actions.onCommentSelectSectionInProcess(
-        pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
-      );
-    }
+
   }
 
   /**
@@ -63,14 +63,17 @@ export default class FilmstripEventWrap extends Component<any, any> {
     const inputData: TFilmstripInputData = this.props.inputData;
     const actions: TFilmstripActions = this.props.actions;
     const cursorPosition: ICursorPosition = this.props.cursorPosition;
-    console.log("Mouse down handler starts ");
+
+    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
     // call onFilmstripSelectSectionStart action to start the filmstrip highlight selection
-    // actions.onHighlightSelectSectionStart(
-    //   pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
-    // );
-    // actions.onCommentSelectSectionStart(
-    //   pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
-    // );
+      actions.onHighlightSelectSectionStart(
+        pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+      );
+    }else if(inputData.activeCommentData != null && inputData.activeHighlightData == null){
+      actions.onCommentSelectSectionStart(
+        pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+      );
+    }
   }
 
   /**
@@ -86,30 +89,30 @@ export default class FilmstripEventWrap extends Component<any, any> {
       cursorPosition.x, inputData.boundaryData, inputData.dimensionsData,
     );
 
+    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
     // check the time difference between start and end time
-    // if (Math.abs(inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime - onClickTimeStamp) < 0.5) {
-    //   // if the difference is less then 0.5 second, then it will be seen as a click event
-    //   actions.onHighlightSelectSectionClear();
-    //   actions.onVideoPlayerSeek(onClickTimeStamp);
-    // } else {
-    //   // Otherwise it is a drag event
-    //   actions.onHighlightSelectSectionEnd(
-    //     inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime, onClickTimeStamp,
-    //   );
-    // }
-
-    if (Math.abs(inputData.indicatorData.selectSectionDataComment.selectSectionStartTime - onClickTimeStamp) < 0.5) {
-      // if the difference is less then 0.5 second, then it will be seen as a click event
-      console.log("Was just a comment click");
-      actions.onCommentSelectSectionClear();
-      actions.onVideoPlayerSeek(onClickTimeStamp);
-    } else {
-      // Otherwise it is a drag event
-      console.log("Continue Draggin");
-      console.log(inputData.indicatorData.selectSectionDataComment);
-      // actions.onCommentSelectSectionEnd(
-      //   inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp, "Test"
-      // );
+      if (Math.abs(inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime - onClickTimeStamp) < 0.5) {
+        // if the difference is less then 0.5 second, then it will be seen as a click event
+        actions.onHighlightSelectSectionClear();
+        actions.onVideoPlayerSeek(onClickTimeStamp);
+      } else {
+        // Otherwise it is a drag event
+        actions.onHighlightSelectSectionEnd(
+          inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime, onClickTimeStamp,
+        );
+      }
+    }else if(inputData.activeCommentData != null && inputData.activeHighlightData == null){
+      if (Math.abs(inputData.indicatorData.selectSectionDataComment.selectSectionStartTime - onClickTimeStamp) < 0.5) {
+        // if the difference is less then 0.5 second, then it will be seen as a click event
+        actions.onCommentSelectSectionClear();
+        actions.onVideoPlayerSeek(onClickTimeStamp);
+      } else {
+        // Otherwise it is a drag event
+        // actions.onCommentSendText(uuid.v4(),
+        //   inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp, "Test"
+        // );
+        actions.onCommentSelectSectionEndFS("",inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp);
+      }
     }
   }
 
@@ -134,6 +137,7 @@ export default class FilmstripEventWrap extends Component<any, any> {
           boundaryData={inputData.boundaryData}
           thumbnailData={inputData.thumbnailData}
           cursorPosition={cursorPosition}
+          commentData={inputData.commentData}
         />
         <ViewCountCore
           className={styles.viewcount}
@@ -157,6 +161,8 @@ export default class FilmstripEventWrap extends Component<any, any> {
           onVideoPlayerPlayCommentClick={actions.onVideoPlayerPlayCommentClick}
           onCommentHover={actions.onCommentHover}
           cursorPosition={cursorPosition}
+          editCommentFilmStrip = {actions.editCommentFilmStrip}
+          cancelCommentEditFilmstrip = {actions.cancelCommentEditFilmstrip}
         />
 
         <IndicatorCore

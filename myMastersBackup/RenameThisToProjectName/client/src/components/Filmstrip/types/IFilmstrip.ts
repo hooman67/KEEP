@@ -22,6 +22,8 @@ export type TFilmstripInputData = {
   thumbnailData: any,
   highlightData: IHighlightData[],
   commentData: ICommentData[],
+  activeCommentData: any;
+  activeHighlightData: any;
   viewcountData: IViewCountData,
   indicatorData: {
     currentTimeData: number,
@@ -44,7 +46,10 @@ export type TFilmstripActions = {
   onCommentSelectSectionEnd: Function;
   onVideoPlayerPlayCommentClick: Function;
   onCommentHover: Function;
-  onCommentSendText: Function;
+  onCommentSendFilmStripText: Function;
+  onCommentSelectSectionEndFS: Function;
+  editCommentFilmStrip: Function;
+  cancelCommentEditFilmstrip: Function;
 };
 
 export interface IFilmstrip {

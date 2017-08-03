@@ -8,14 +8,21 @@ export {
   onCommentSelectSectionClear,
   onCommentSelectSectionEnd,
   onCommentSendText,
+  onCommentSendFilmStripText,
   onCommentEditText,
   onCommentDeleteText,
   onCommentReply,
   onCommentColorSelection,
+  onCommentModeChange,
   onCommentRemoveOff,
   onCommentToggleMultipleCommentRemoval,
   onCommentSetCommentRemove,
-  
+  onCommentSelectSectionEndFS,
+  onCommentExpandAll,
+  onCommentViewMoreTrue,
+  onCommentViewMoreFalse,
+  editCommentFilmStrip,
+  cancelCommentEditFilmstrip,
 } from './Actions';
 
 export {

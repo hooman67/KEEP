@@ -16,26 +16,28 @@ export default class Word extends Component<IWordProps, any> {
     this.onMousedownHandler = this.onMousedownHandler.bind(this);
     this.onMouseupHandler = this.onMouseupHandler.bind(this);
     this.onMouseMoveHandler = this.onMouseMoveHandler.bind(this);
-    this.seekPlayer = this.seekPlayer.bind(this);
     this.isCurrentTimeInterval = this.isCurrentTimeInterval.bind(this);
     this.generateWord = this.generateWord.bind(this);
+    this.handleMouseOut = this.handleMouseOut.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.state = {key: Math.random()};
   }
 
   onMouseMoveHandler () {
     const selectSection = this.props.selectSection;
     if (selectSection.status === 'start') {
-      if(this.props.hsActiveHighlightColor!== null){
+      if(this.props.highlightingMode){
         this.props.action.onHighlightSelectSectionInProcess(this.props.word.end);
-      } else{
+      } if(1/*this.props.commentingMode*/){
         this.props.action.onCommentSelectSectionInProcess(this.props.word.end);
       }
     }
   }
 
   onMousedownHandler () {
-    if(this.props.hsActiveHighlightColor!== null){
+    if(this.props.highlightingMode){
       this.props.action.onHighlightSelectSectionStart(this.props.word.start);
-    } else{
+    } if(1/*this.props.commentingMode*/){
       /*hs This stores the start timestamp of the select sections in
       selectSection.selectSectionStartTime. Look at CommentReducer.ts in srvs
       */
@@ -44,25 +46,37 @@ export default class Word extends Component<IWordProps, any> {
 
   }
 
-  onMouseupHandler () {
+  onMouseupHandler (forceComment) {
     const selectSection = this.props.selectSection;
-    if(this.props.hsActiveHighlightColor!== null){
+
+    if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
+      this.props.displayButton(selectSection.selectSectionStartTime, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
+    }else{
+      this.props.displayButton(this.props.word.start, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
+    }
+
+    if(this.props.highlightingMode){
       if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
-        this.props.action.onHighlightSelectSectionEnd(selectSection.selectSectionStartTime, this.props.word.end);
+        this.props.action.onHighlightSelectSectionEnd(selectSection.selectSectionStartTime, this.props.word.end, forceComment);
       } else {
         this.props.action.onHighlightSelectSectionClear();
       }
-    } else {
+    } if(this.props.commentingMode || forceComment) {
       if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
-        this.props.action.onCommentSelectSectionEnd("", selectSection.selectSectionStartTime, this.props.word.end);
+        this.props.action.onCommentSelectSectionEnd("", selectSection.selectSectionStartTime, this.props.word.end, forceComment);
       } else {
         this.props.action.onCommentSelectSectionClear();
       }
     }
 
   }
-  seekPlayer () {
+
+  handleClick(){
     this.props.action.onVideoPlayerSeek(this.props.word.start);
+  }
+
+  handleMouseOut () {
+    this.props.displayButtonFalse();
   }
   /** handler for adding css for highlight based on entries in word.colors */
   getHighlight () {
@@ -95,9 +109,15 @@ export default class Word extends Component<IWordProps, any> {
   }
 
   generateWord () {
-    const highlight = {
+    const highlightRegular = {
       background: this.getHighlight(),
     };
+
+    const highlightInterval = {
+      background: '#ffb900',
+    };
+
+    const highlight = (this.props.showInterval) ? highlightInterval: highlightRegular;
 
     const action = {
       onCommentSendText: this.props.action.onCommentSendText,
@@ -108,6 +128,10 @@ export default class Word extends Component<IWordProps, any> {
       onMouseupHandler: this.onMouseupHandler,
       onMousedownHandler: this.onMousedownHandler,
       onMouseMoveHandler: this.onMouseMoveHandler,
+      onCommentViewMore: this.props.action.onCommentViewMore,
+      SidebarOpen: this.props.action.SidebarOpen,
+      onViewMore: this.props.action.onViewMore,
+      showCommentIntervalWord: this.props.action.showCommentIntervalWord,
     };
 
     const number = 1;
@@ -116,12 +140,13 @@ export default class Word extends Component<IWordProps, any> {
       return (
         <span>
           <span
+            key = {this.state.key}
             className={this.isCurrentTimeInterval() ? styles.red : null}
             style={highlight}
             onMouseDown={this.onMousedownHandler}
-            onMouseUp={this.onMouseupHandler}
+            onMouseUp={()=>{this.onMouseupHandler(false)}}
             onMouseMove={this.onMouseMoveHandler}
-            onClick={this.seekPlayer}
+            onClick={this.handleClick}
           >
             {this.props.word.text}{' '}
           </span>
@@ -135,12 +160,13 @@ export default class Word extends Component<IWordProps, any> {
     } else{
       return (
         <span
+          key = {this.state.key}
           className={this.isCurrentTimeInterval() ? styles.red : null}
           style={highlight}
           onMouseDown={this.onMousedownHandler}
-          onMouseUp={this.onMouseupHandler}
+          onMouseUp={()=>{this.onMouseupHandler(false)}}
           onMouseMove={this.onMouseMoveHandler}
-          onClick={this.seekPlayer}
+          onClick={this.handleClick}
         >
           {this.props.word.text}{' '}
         </span>
@@ -148,9 +174,16 @@ export default class Word extends Component<IWordProps, any> {
     }
   }
 
+componentWillReceiveProps() {
+//console.log(this.props.showInterval);
+  this.forceUpdate();
+
+}
+
   render () {
+    //console.log('rendering');
     return (
-      <span>
+      <span >
         {this.generateWord()}
       </span>
     );

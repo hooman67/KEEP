@@ -179,7 +179,10 @@ const currentTimeData = state => state.activeVideo.player ? state.activeVideo.pl
 const highlightSelectSectionData = state => state.activeVideo.highlight ? state.activeVideo.highlight.selectSection : null;
 const commentSelectSectionData = state => state.activeVideo.comment ? state.activeVideo.comment.selectSection : null;
 const commentData = state => state.activeVideo.comment ? state.activeVideo.comment.commentData : null;
-
+const activeCommentColor = state => state.activeVideo.comment ? state.activeVideo.comment.activeCommentColor: null;
+const commentingMode = state => state.activeVideo.comment ? state.activeVideo.comment.commentingMode: false;
+const activeHighlightColor = state => state.activeVideo.highlight ? state.activeVideo.highlight.activeHighlightColor: null;
+const highlightingMode = state => state.activeVideo.highlight ? state.activeVideo.highlight.highlightingMode: false;
 // Level 1 Dimensions Selector
 const filmstripDimensionsSelector = createSelector(
   filmstripDimensions,
@@ -435,7 +438,6 @@ const commentSelectSectionSelector = createSelector(
       let timestampEndSelectSection: number = null;
       let timestampStartSelectSection: number = null;
       if (commentSelectSectionData.status !== 'free' && commentSelectSectionData.selectSectionEndTime) {
-        console.log("commentSelectSectionSelector");
         // calculate the start time and end time of the highlight select section
         if (commentSelectSectionData.selectSectionEndTime < commentSelectSectionData.selectSectionStartTime) {
           selectSectionEndTime = commentSelectSectionData.selectSectionStartTime;
@@ -494,7 +496,7 @@ const filmstripCommentSelector = createSelector(
       for (const singleColor in commentData) {
         const offset: number = baseHeight * colorCounter;
         const color: string = singleColor;
-        const data: { start: number, end: number, Text: string }[] = commentData[singleColor];
+        const data: { start: number, end: number, Text: string, _id: string, Parent: string, TimeStamp: string }[] = commentData[singleColor];
         colorCounter += 1;
 
         for (const comment in data) {
@@ -519,10 +521,14 @@ const filmstripCommentSelector = createSelector(
               width: end - start,
               height: baseHeight,
               fill: color,
+              showTimeRange: false,
               onClickData: {
+                _id: data[comment]._id,
                 start: data[comment].start,
                 end: data[comment].end,
                 Text: data[comment].Text,
+                Parent: data[comment].Parent,
+                TimeStamp: data[comment].TimeStamp,
               },
             });
             commentCounter += 1;
@@ -534,6 +540,29 @@ const filmstripCommentSelector = createSelector(
   },
 );
 
+const filmstripActiveComponentSelector = createSelector(
+  filmstripDimensionsSelector,
+  activeCommentColor,
+  (filmstripDimensions, activeCommentColor) => {
+    if (!filmstripDimensions || !activeCommentColor) {
+      return null;
+    }
+    return activeCommentColor
+  },
+);
+
+const filmstripActiveHiglightSelector = createSelector(
+  filmstripDimensionsSelector,
+  activeHighlightColor,
+  highlightingMode,
+  commentingMode,
+  (filmstripDimensions, activeHighlightColor, highlightingMode, commentingMode) => {
+    if (!filmstripDimensions || !activeHighlightColor || !highlightingMode || commentingMode) {
+      return null;
+    }
+    return activeHighlightColor
+  },
+);
 
 // Level 3 Final Result Selector
 export const filmstripAggregateSelector = createSelector(
@@ -545,14 +574,16 @@ export const filmstripAggregateSelector = createSelector(
   commentSelectSectionSelector,
   filmstripCommentSelector,
   timeMarkSelector,
-  (filmstripDimensions, highlightData, viewCountData, currentTimeData, highlightSelectSectionData, commentSelectSectionData, filmstripCommentSelector, markerData) => {
+  filmstripActiveComponentSelector,
+  filmstripActiveHiglightSelector,
+  (filmstripDimensions, highlightData, viewCountData, currentTimeData, highlightSelectSectionData, commentSelectSectionData, commentData, markerData, activeCommentColor, activeHighlightColor) => {
     if (
       !filmstripDimensions
       || !highlightData
       || !viewCountData
       || !currentTimeData
       || !highlightSelectSectionData
-      || !filmstripCommentSelector
+      || !commentData
       || !markerData
     ) {
       return null;
@@ -573,7 +604,9 @@ export const filmstripAggregateSelector = createSelector(
         },
         thumbnailData: thumbnail,
         highlightData: highlightData[i],
-        commentData: filmstripCommentSelector[i],
+        commentData: commentData[i],
+        activeCommentData: activeCommentColor,
+        activeHighlightData: activeHighlightColor,
         viewcountData: viewCountData[i],
         indicatorData: {
           currentTimeData: currentTimeData[i],

@@ -13,6 +13,7 @@ export const commentNormalize = (comments: Array<IComment>) => {
   comments.forEach((comment) => {
     result[comment.Color].push({
       _id: comment._id,
+      TimeStamp: comment.TimeStamp,
       start: comment.TimeRange.start,
       end: comment.TimeRange.end,
       Color: comment.Color,
@@ -136,6 +137,7 @@ export const commentGenerateDiff = (newComments, preComments, color) => {
       comment._id = uuid.v4();
       commentUpdate.create.push({
         _id: comment._id,
+        TimeStamp: comment.TimeStamp,
         TimeRange: {
           start: comment.start,
           end: comment.end,

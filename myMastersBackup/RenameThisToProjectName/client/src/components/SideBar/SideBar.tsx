@@ -47,7 +47,7 @@ render () {
                               );
                             } else
                           {
-                            listHighlightsRed = null;
+                            listHighlightsRed = <span></span>;
                           };
 
 
@@ -62,7 +62,7 @@ render () {
                                 );
                               } else
                             {
-                              listHighlightsGreen = null;
+                              listHighlightsGreen = <span></span>;
                             };
 
                             if (this.props.highlight.highlightData.blue[0] != null)
@@ -76,7 +76,7 @@ render () {
                                   );
                                 } else
                               {
-                                listHighlightsBlue = null;
+                                listHighlightsBlue = <span></span>;
                               };
 
                               if (this.props.highlight.highlightData.yellow[0] != null)
@@ -90,7 +90,7 @@ render () {
                                     );
                                   } else
                                 {
-                                  listHighlightsYellow = null;
+                                  listHighlightsYellow = <span></span>;
                                 };
 
                                 if (this.props.highlight.highlightData.purple[0] != null)
@@ -104,7 +104,7 @@ render () {
                                       );
                                     } else
                                   {
-                                    listHighlightsPurple = null;
+                                    listHighlightsPurple = <span></span>;
                                   };
 
 
@@ -118,7 +118,7 @@ render () {
                           return (
 
                                           <div>
-                                            <div style = {divStyleRed}> {listHighlightsRed} </div>
+                                            <div style = {divStyleRed}> {listHighlightsRed}  </div>
                                             <div style = {divStyleGreen}> {listHighlightsGreen} </div>
                                             <div style = {divStyleYellow}> {listHighlightsYellow} </div>
                                             <div style = {divStyleBlue}> {listHighlightsBlue} </div>

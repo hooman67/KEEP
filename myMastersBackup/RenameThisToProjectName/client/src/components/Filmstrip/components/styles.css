@@ -35,11 +35,11 @@
 }
 
 .comment {
-  z-index: 3;
+  z-index: 5;
   background-color: lightgray;
   opacity: 0.8;
-  position: relative;
-  top: 40px;
+  position: absolute;
+  top: 0;
   left: 0;
 }
 
@@ -57,5 +57,4 @@
   opacity: 1.0;
   top:0;
   left:0;
-
 }

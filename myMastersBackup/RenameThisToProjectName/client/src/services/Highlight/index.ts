@@ -8,6 +8,7 @@ export {
   onHighlightSelectSectionClear,
   onHighlightSelectSectionEnd,
   onHighlightColorSelection,
+  onHighlightModeChange,
   onHighlightRemoveOff,
   onHighlightToggleMultipleHighlightRemoval,
   onHighlightSetHighlightRemove,

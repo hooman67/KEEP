@@ -15,9 +15,12 @@ export interface IWordProps {
   action: any;
   word: IWord;
   currentTime: number;
-  hsActiveHighlightColor: any;
-  hsActiveCommentColor: any; 
+  highlightingMode: any;
+  commentingMode: any;
   comments: Array<any>;
+  displayButton: any;
+  displayButtonFalse: any;
+  showInterval: any;
 }
 export interface ICommentProps {
   comments: Array<any>;
@@ -52,4 +55,5 @@ export interface ITranscriptProps {
   onVideoPlayerSeek: Function;
   onCommonTranscriptSeek: Function;
   activeVideo: any;
+  transcriptUpdate: any;
 }

@@ -1,0 +1,21 @@
+.container {
+  z-index: 99;
+  position: absolute;
+  display: flex;
+}
+
+.picker {
+  width: 160px;
+}
+
+.icon {
+  flex: 1;
+  background: white;
+  border-radius: 1.5px;
+  border: 1.5px solid lightgray; 
+  height: 37px;
+}
+
+.icon:hover { 
+  transform: scale(1.1); 
+}

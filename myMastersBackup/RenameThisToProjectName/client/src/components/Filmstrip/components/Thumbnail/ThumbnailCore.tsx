@@ -65,6 +65,7 @@ export default class ThumbnailCore extends Component<IThumbnailCore, null> {
       thumbnailList.push(
         <Thumbnail
           key={i}
+          commentData={this.props.commentData}
           dimensions={{
             height: dimensionsData.thumbnail.thumbnailHeight,
             width: dimensionsData.thumbnail.thumbnailWidth,

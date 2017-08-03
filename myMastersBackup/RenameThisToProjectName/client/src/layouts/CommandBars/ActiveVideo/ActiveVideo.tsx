@@ -7,11 +7,14 @@ import {
   Toggle,
 } from 'office-ui-fabric-react/lib/Toggle';
 import {
-  DefaultButton, PrimaryButton
+  DefaultButton, PrimaryButton, IconButton, IButtonProps
 } from 'office-ui-fabric-react/lib/Button';
+
+
 import {
   onHighlightToggle,
   onHighlightColorSelection,
+  onHighlightModeChange,
   onHighlightSetHighlightRemove,
   onHighlightToggleMultipleHighlightRemoval,
   onHighlightRemoveOff,
@@ -19,9 +22,11 @@ import {
 import {
   onCommentToggle,
   onCommentColorSelection,
+  onCommentModeChange,
   onCommentSetCommentRemove,
   onCommentToggleMultipleCommentRemoval,
   onCommentRemoveOff,
+  onCommentExpandAll,
 } from '../../../services/Comment';
 import {
   onTranscriptSearch,
@@ -45,7 +50,7 @@ const colorArray = [
   },
   {
     name: 'green',
-    display: 'Greent',
+    display: 'Green',
   },
   {
     name: 'yellow',
@@ -78,16 +83,89 @@ const commentPrivacyArray = [
 
 class ActiveVideoCommandBar extends Component<any, any> {
 
-  handleClick()
-  {
 
-    this.props.SidebarOpen();
 
+  constructor(){
+      super();
+      this.state = {  comment:false, highlight:false};
+      this.clickComment = this.clickComment.bind(this);
+      this.clickHighlight = this.clickHighlight.bind(this);
+      this.handleClickInspector = this.handleClickInspector.bind(this);
+      this.handleClickExpand = this.handleClickExpand.bind(this);
+      this.getPrivacyLevle = this.getPrivacyLevle.bind(this);
   }
 
+    getPrivacyLevle(color){
+      switch (color) {
+        case "red":
+          return 'Public';
+        case "blue":
+          return 'Friends';
+        case "green":
+          return 'Private';
+        case "yellow":
+          return 'Instructor';
+        default:
+          return 'None';
+      }
+    }
+
+    clickComment(){
+      this.setState({comment:!this.state.comment});
+      this.props.onCommentModeChange(!this.state.comment);
+    }
+
+    clickHighlight(){
+      this.setState({highlight:!this.state.highlight})
+      this.props.onHighlightModeChange(!this.state.highlight);
+    }
+
+    handleClickInspector(){
+      this.props.SidebarOpen();
+    }
+
+    handleClickExpand(){
+      this.props.onCommentExpandAll();
+    }
 
   render () {
     // console.log('hs ActiveVideoCommandBar(ActVid.tsx) this.props:\n', this.props);
+    const style1   = { backgroundColor: 'white', width: '40px', minWidth: '40px' };
+
+
+    const buttonInspector = this.props.isOpen
+          ? <PrimaryButton
+            disabled={ false }
+            styles = {style1}
+            text='Inspector'
+            onClick={ this.handleClickInspector.bind(this) }>
+          </PrimaryButton>
+          : <DefaultButton
+            disabled={ false }
+            styles = {style1}
+            text='Inspector'
+            onClick={  this.handleClickInspector.bind(this)  }>
+          </DefaultButton>;
+
+
+    const buttonExpandComment = this.props.commentExpandAll
+          ? <PrimaryButton
+            disabled={ false }
+            styles = {style1}
+            text='Collapse'
+            onClick={ this.handleClickExpand.bind(this) }>
+          </PrimaryButton>
+          : <DefaultButton
+            disabled={ false }
+            styles = {style1}
+            text='Expand'
+            onClick={  this.handleClickExpand.bind(this)  }>
+          </DefaultButton>;
+
+
+
+///
+
     return (
       <div className={styles.container}>
         <SearchBox
@@ -139,68 +217,11 @@ class ActiveVideoCommandBar extends Component<any, any> {
           >
           </DefaultButton>
         </div>
-          <div className={styles.playHighlightContainer}>
-          <DefaultButton
-            iconProps={
-              {
-                iconName: 'Play',
-                style: {
-                  color: this.props.player.commentColor,
-                },
-              }
-            }
-            text='Play Comment'
-            menuProps={
-              {
-                items: colorArray.map((color) => {
-                  return {
-                    key: color.name,
-                    name: color.display,
-                    iconProps: {
-                      iconName: 'Color',
-                      style: {
-                        color: color.name,
-                      },
-                    },
-                    onClick: () => (this.props.onVideoPlayerPlayCommentClick(this.props.comment.commentData, color.name)),
-                  };
-                }),
-              }
-            }
-          >
-          </DefaultButton>
-        </div>
-        <div className={styles.addHighlightContainer}>
-          <DefaultButton
-            iconProps={
-              {
-                iconName: 'Edit',
-                style: {
-                  color: this.props.highlight.activeHighlightColor,
-                },
-              }
-            }
-            text='Add Highlight'
-            menuProps={
-              {
-                items: colorArray.map((color) => {
-                  return {
-                    key: color.name,
-                    name: color.display,
-                    iconProps: {
-                      iconName: 'Color',
-                      style: {
-                        color: color.name,
-                      },
-                    },
-                    onClick: () => (this.props.onHighlightColorSelection(color.name)),
-                  };
-                }),
-              }
-            }
-          >
-          </DefaultButton>
-        </div>
+
+
+
+
+
         <div className={styles.removeHighlightContainer}>
           <DefaultButton
             iconProps={ { iconName: 'Remove' } }
@@ -229,20 +250,65 @@ class ActiveVideoCommandBar extends Component<any, any> {
           >
           </DefaultButton>
         </div>
-        <div className={styles.addCommentContainer}>
-          <DefaultButton
-            iconProps={
-              {
-                iconName: 'Color',
-                style: {
-                  color: this.props.comment.activeCommentColor,
-                },
-              }
 
-            }
+
+
+
+
+        <div>
+          <DefaultButton
+            data-automation-id='test'
+            disabled={ false }
+            checked={ this.state.highlight }
+            iconProps={ { 
+                          iconName: 'Edit',
+                          style: {
+                            color: this.props.highlight.activeHighlightColor,
+                          }, 
+                      } }
+            onClick={ this.clickHighlight.bind(this) }
+            split={ true }
             menuProps={
               {
-              
+                items: colorArray.map((color) => {
+                  return {
+                    key: color.name,
+                    name: color.display,
+                    iconProps: {
+                      iconName: 'Color',
+                      style: {
+                        color: color.name,
+                      },
+                    },
+                    onClick: () => (this.props.onHighlightColorSelection(color.name)),
+                  };
+                }),
+              }
+            }
+          />
+        </div>
+
+
+
+
+
+
+        <div>
+          <DefaultButton
+            data-automation-id='test'
+            disabled={ false }
+            checked={ this.state.comment }
+            iconProps={ { 
+                          iconName: 'chat',
+                          style: {
+                            color: this.props.comment.activeCommentColor,
+                          },  
+                      } }
+            text={this.getPrivacyLevle(this.props.comment.activeCommentColor)}
+            onClick={ this.clickComment.bind(this) }
+            split={ true }
+            menuProps={
+              {
                 items: commentPrivacyArray.map((color) => {
                   return {
                     key: color.name,
@@ -258,32 +324,17 @@ class ActiveVideoCommandBar extends Component<any, any> {
                 }),
               }
             }
-          >
-          </DefaultButton>
+          />
         </div>
-        
 
-        <div className={styles.addCommentContainer}>
-          <DefaultButton
-            iconProps={
-              {
-                iconName: 'Edit',
-                style: {
-                  color: this.props.comment.activeCommentColor,
-                },
-              }
-            }
-          >
-          </DefaultButton>
-        </div>
 
 
 
         <div className={styles.addSideBarContainer}>
-          <PrimaryButton
-          text='SideBar'
-          onClick={this.handleClick.bind(this)}/>
+          {buttonExpandComment}
         </div>
+
+
       </div>
     );
   }
@@ -294,6 +345,7 @@ const actions = {
   onVideoPlayerPlayHighlightStart,
   onVideoPlayerPlayCommentClick,
   onHighlightColorSelection,
+  onHighlightModeChange,
   onHighlightSetHighlightRemove,
   onHighlightToggleMultipleHighlightRemoval,
   onHighlightRemoveOff,
@@ -303,7 +355,9 @@ const actions = {
   onCommentSetCommentRemove,
   onCommentToggleMultipleCommentRemoval,
   onCommentRemoveOff,
-  SidebarOpen
+  SidebarOpen,
+  onCommentModeChange,
+  onCommentExpandAll,
 };
 
 function mapStateToProps (state) {
@@ -311,6 +365,10 @@ function mapStateToProps (state) {
     player: state.activeVideo.player,
     highlight: state.activeVideo.highlight,
     comment: state.activeVideo.comment,
+    isOpen: state.SidebarReducer.isOpen,
+    commentExpandAll: state.activeVideo.comment.commentExpandAll,
+
+
   };
 }
 

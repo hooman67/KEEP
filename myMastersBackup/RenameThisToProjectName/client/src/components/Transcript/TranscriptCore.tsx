@@ -5,7 +5,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
-
+import ReactCursorPosition from 'react-cursor-position';
+import ColorPickerO from '../../components/ColorPickerO';
 
 import {
   secondsToHms,
@@ -30,6 +31,7 @@ import {
   onCommentDeleteText,
   onCommentReply,
   onCommentSelectSectionClear,
+  onCommentViewMoreTrue,
 } from '../../services/Comment';
 import {
   onVideoPlayerSeek,
@@ -38,13 +40,45 @@ import styles from './styles.css';
 import Word from './components/Word';
 /*import Comment from './components/Comment';*/
 import { transcriptSelector } from './TranscriptSelector';
+import {SidebarOpen} from '../../layouts/CommandBars/ActiveVideo/sidebarAction';
 
-class TranscriptCore extends Component<any, any>  {
+
+class Transcript extends Component<any, any>  {
 
   constructor (props: any) {
     super(props);
     this.generateTranscript = this.generateTranscript.bind(this);
+    this.state = {
+                    displayButton: false,
+                    start: null,
+                    end: null,
+                    commentAdder: null,
+                  };
+    this.handleDisplayButton = this.handleDisplayButton.bind(this);
+    this.handleDisplayButtonFalse = this.handleDisplayButtonFalse.bind(this);
   }
+
+  handleDisplayButton(istart, iend, itext, commentadder){
+
+    this.setState({
+      displayButton: true,
+      start: istart,
+      end: iend,
+      text: itext,
+      commentAdder: commentadder,
+    });
+    console.log('Entered on mouse click on word');
+    console.log(this.state);
+
+  }
+
+  handleDisplayButtonFalse(){
+    this.setState({displayButton: false});
+    console.log('Entered on mouse out');
+
+  }
+
+
 
   generateTranscript () {
     const action = {
@@ -61,11 +95,15 @@ class TranscriptCore extends Component<any, any>  {
       onCommentEditText: this.props.onCommentEditText,
       onCommentDeleteText: this.props.onCommentDeleteText,
       onCommentReply: this.props.onCommentReply,
+      onCommentViewMore: this.props.onCommentViewMoreTrue,
+      SidebarOpen: this.props.SidebarOpen,
+      onViewMore: this.props.onViewMore,
+      showCommentIntervalWord: this.props.showCommentIntervalWord,
     };
 
-    var tempSelectSection = this.props.highlight.activeHighlightColor
-    !== null ? this.props.highlight.selectSection :
-    this.props.comment.selectSection;
+    var tempSelectSection = this.props.highlight.highlightingMode ?
+      this.props.highlight.selectSection :
+      this.props.comment.selectSection;
 
     const result = (this.props.transcript || []).map(word => {
         return (
@@ -74,10 +112,13 @@ class TranscriptCore extends Component<any, any>  {
             action={action}
             currentTime={this.props.currentTime}
             selectSection={tempSelectSection}
-            hsActiveHighlightColor={this.props.highlight.activeHighlightColor}
-            hsActiveCommentColor={this.props.comment.activeCommentColor}
+            highlightingMode={this.props.highlight.highlightingMode}
+            commentingMode={this.props.comment.commentingMode}
             word={word}
             comments={word.comments}
+            displayButton = {this.handleDisplayButton.bind(this)}
+            displayButtonFalse = {this.handleDisplayButton.bind(this)}
+            showInterval = {word.showInterval}
           />
         );
     });
@@ -106,6 +147,7 @@ class TranscriptCore extends Component<any, any>  {
   /** Handler for generating lineComponent.
   Index component is used for generating timestamps ids.
   Measure is used to compute component dimension. */
+  //
 
 
 
@@ -113,9 +155,25 @@ class TranscriptCore extends Component<any, any>  {
 
   render () {
     return (
-      <div>
-        {this.generateTranscript()}
-      </div>
+      <ReactCursorPosition className={styles.transcriptContainer}>
+        {
+          (this.state.displayButton)?
+           (
+            <ColorPickerO
+              clickStart = {this.state.start}
+              clickEnd = {this.state.end}
+              clickText = {this.state.text}
+              clickCommentAdder = {this.state.commentAdder}
+            />
+          )
+          :
+          (<span></span>)
+        }
+        <div>
+          {this.generateTranscript()}
+        </div>
+
+      </ReactCursorPosition>
     );
   }
 }
@@ -134,6 +192,8 @@ const actions = {
   onCommentEditText,
   onCommentDeleteText,
   onCommentReply,
+  onCommentViewMoreTrue,
+  SidebarOpen,
 };
 
 function mapStateToProps (state) {
@@ -145,4 +205,4 @@ function mapStateToProps (state) {
   };
 }
 
-export default connect(mapStateToProps, actions)(TranscriptCore);
+export default connect(mapStateToProps, actions)(Transcript);

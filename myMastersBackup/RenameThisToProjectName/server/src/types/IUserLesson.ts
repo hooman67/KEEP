@@ -11,6 +11,7 @@ export interface IHighlight extends mongoose.Types.Subdocument {
 
 export interface IComment extends mongoose.Types.Subdocument {
   _id: string;
+  TimeStamp: string;
   Color: string;
   TimeRange: {
     start: number;

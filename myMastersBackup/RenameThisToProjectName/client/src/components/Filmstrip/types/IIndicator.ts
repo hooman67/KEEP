@@ -47,15 +47,6 @@ export interface ISelectSectionIndicator {
     selectSectionEndTime: number | null;
     status: ('free' | 'end' | 'start');
   };
-  // selectSectionDataComment:{
-  //   display:{
-  //     x:number,
-  //     width: number,
-  //   },
-  //   selectSectionStartTime: number | null;
-  //   selectSectionEndTime: number | null;
-  //   status: ('free' | 'end' | 'start');
-  // };
 }
 
 export interface ISelectSectionIndicatorComment{
@@ -68,5 +59,7 @@ export interface ISelectSectionIndicatorComment{
     selectSectionStartTime: number | null;
     selectSectionEndTime: number | null;
     status: ('free' | 'end' | 'start');
+    activeCommentColor: null;
   };
 }
+

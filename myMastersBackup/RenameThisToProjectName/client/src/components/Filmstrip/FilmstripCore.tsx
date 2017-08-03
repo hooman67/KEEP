@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import ReactCursorPosition from 'react-cursor-position';
+import ReactToolTip from 'react-tooltip';
 import Perf from 'react-addons-perf';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
 import Filmstrip from './components/Filmstrip';
+import ColorPicker from '../ColorPicker';
 import styles from './styles.css';
 import {
   onHighlightSelectSectionStart,
@@ -15,7 +18,10 @@ import {
   onCommentSelectSectionInProcess,
   onCommentSelectSectionClear,
   onCommentSelectSectionEnd,
-  onCommentSendText
+  onCommentSendFilmStripText,
+  onCommentSelectSectionEndFS,
+  editCommentFilmStrip,
+  cancelCommentEditFilmstrip
 } from '../../services/Comment';
 import {
   onVideoPlayerPlayHighlightStart,
@@ -46,6 +52,7 @@ class FilmstripCore extends Component<any, any> {
       <Measure
         onMeasure={dimensions => this.props.onFilmstripResize(dimensions)}
       >
+       <ReactCursorPosition className={styles.container}>
         <div className={styles.filmstripCore}>
           {
             !this.props.filmstrip ? null : this.props.filmstrip.map((data) => {
@@ -65,7 +72,10 @@ class FilmstripCore extends Component<any, any> {
                     onCommentSelectSectionEnd: this.props.onCommentSelectSectionEnd,
                     onVideoPlayerPlayCommentClick: this.props.onVideoPlayerPlayCommentClick,
                     onCommentHover: this.props.onCommentHover,
-                    onCommentSendText: this.props.onCommentSendText,
+                    onCommentSendFilmStripText: this.props.onCommentSendFilmStripText,
+                    onCommentSelectSectionEndFS: this.props.onCommentSelectSectionEndFS,
+                    editCommentFilmStrip: this.props.editCommentFilmStrip,
+                    cancelCommentEditFilmstrip: this.props.cancelCommentEditFilmstrip,
                   }}
                   inputData={data}
                 />
@@ -73,6 +83,8 @@ class FilmstripCore extends Component<any, any> {
             })
           }
         </div>
+          <ColorPicker />
+        </ReactCursorPosition>
       </Measure>
     );
   }
@@ -92,7 +104,10 @@ const actions = {
   onFilmstripResize,
   onVideoPlayerPlayCommentClick,
   onCommentHover,
-  onCommentSendText,
+  onCommentSendFilmStripText,
+  onCommentSelectSectionEndFS,
+  editCommentFilmStrip,
+  cancelCommentEditFilmstrip
 };
 
 function mapStateToProps (state) {

@@ -76,13 +76,13 @@ export default function (state = INITIAL_STATE, action) {
       console.log("Comment has been clicked");
       console.log(action.commentData);
       state.videoPlayer.play();
-      if (action.commentData.red.length > 0) {
+      if (action.commentData[action.commentColor].length > 0) {
         return {
           ...state,
           isCommentedPlaying: true,
           currentCommentIndex: -1,
           commentData: action.commentData,
-          commentColor: 'red',
+          commentColor: action.commentColor,
           commentIndex: action.commentIndex,
         };
       } else {
@@ -111,10 +111,11 @@ export default function (state = INITIAL_STATE, action) {
 
       case actions.VIDEO_PLAYER_PLAY_NEXT_COMMENT_INTERVAL:
         if (state.currentCommentIndex + 1 < 1) {
-          state.videoPlayer.currentTime(state.commentData.red[state.commentIndex].start);
+          const commentArr = state.commentData[state.commentColor]
+          state.videoPlayer.currentTime(commentArr[state.commentIndex].start);
           return {
             ...state,
-            commentEndTime: state.commentData.red[state.commentIndex].end,
+            commentEndTime: commentArr[state.commentIndex].end,
             currentCommentIndex: state.currentCommentIndex + 1,
           };
         } else {

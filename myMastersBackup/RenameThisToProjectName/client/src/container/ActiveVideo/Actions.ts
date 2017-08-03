@@ -881,39 +881,79 @@ const transcript = [
   { id: 863, text: '', start: 0.000, end: 0.000, colors: [], comments: [],},
 ];
 
+const transcriptEmpt = [];
+
 export const onActiveVideoInit = (id) => {
-  return async dispatch => {
-    const lesson = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}`, {
-      method: 'GET',
-      headers: new Headers({
-        UserUUID: '00000000-0000-0000-0001-000000000001',
-      }),
-    });
-    const lessonJSON = await lesson.json();
-    const highlights = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/highlights`, {
-      method: 'GET',
-      headers: new Headers({
-        UserUUID: '00000000-0000-0000-0001-000000000001',
-      }),
-    });
-    const comments = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/comments`, {
-      method: 'GET',
-      headers: new Headers({
-        UserUUID: '00000000-0000-0000-0001-000000000001',
-      }),
-    });
-    console.log('hs activeVideo/Actions.ts retrieved highlights: ', await highlights,'/n');
-    console.log('hs activeVideo/Actions.ts retrieved comments: ', await comments, '/n');
-    dispatch({
-      type: actions.ACTIVE_VIDEO_INIT,
-      _id: lessonJSON._id,
-      Owner: lessonJSON.Owner,
-      Name: lessonJSON.Name,
-      PreviewImages: lessonJSON.PreviewImages,
-      Video: lessonJSON.Video,
-      Transcript: transcript,
-      Highlights: await highlights.json(),
-      Comments: await comments.json(),
-    });
-  };
+
+  if(id == '00000000-0001-0000-0000-000000000002'){
+     return async dispatch => {
+      const lesson = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000002',
+        }),
+      });
+      const lessonJSON = await lesson.json();
+      const highlights = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/highlights`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000002',
+        }),
+      });
+      const comments = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/comments`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000002',
+        }),
+      });
+      console.log('hs activeVideo/Actions.ts retrieved highlights: ', await highlights,'/n');
+      console.log('hs activeVideo/Actions.ts retrieved comments: ', await comments, '/n');
+      dispatch({
+        type: actions.ACTIVE_VIDEO_INIT,
+        _id: lessonJSON._id,
+        Owner: lessonJSON.Owner,
+        Name: lessonJSON.Name,
+        PreviewImages: lessonJSON.PreviewImages,
+        Video: lessonJSON.Video,
+        Transcript: transcriptEmpt,
+        Highlights: await highlights.json(),
+        Comments: await comments.json(),
+      });
+    };
+  }else{
+    return async dispatch => {
+      const lesson = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000001',
+        }),
+      });
+      const lessonJSON = await lesson.json();
+      const highlights = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/highlights`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000001',
+        }),
+      });
+      const comments = await fetch(`${CLIENT.API.LESSON_API_ENDPOINT}${id}/comments`, {
+        method: 'GET',
+        headers: new Headers({
+          UserUUID: '00000000-0000-0000-0001-000000000001',
+        }),
+      });
+      console.log('hs activeVideo/Actions.ts retrieved highlights: ', await highlights,'/n');
+      console.log('hs activeVideo/Actions.ts retrieved comments: ', await comments, '/n');
+      dispatch({
+        type: actions.ACTIVE_VIDEO_INIT,
+        _id: lessonJSON._id,
+        Owner: lessonJSON.Owner,
+        Name: lessonJSON.Name,
+        PreviewImages: lessonJSON.PreviewImages,
+        Video: lessonJSON.Video,
+        Transcript: transcript,
+        Highlights: await highlights.json(),
+        Comments: await comments.json(),
+      });
+    };
+  }
 };

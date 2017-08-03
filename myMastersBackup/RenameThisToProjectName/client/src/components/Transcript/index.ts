@@ -11,6 +11,9 @@ export {
 
 export {
   onTranscriptSearch,
+  showCommentIntervalWord,
+  hideCommentIntervalWord,
+  transcriptUpdate,
 } from './Actions';
 
 export {

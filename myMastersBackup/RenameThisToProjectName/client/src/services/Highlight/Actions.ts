@@ -64,6 +64,8 @@ export const onHighlightSelectSectionClear = ActionCreator<IAction>(actions.HIGH
 
 export const onHighlightColorSelection = ActionCreator<IAction>(actions.HIGHLIGHT_SELECT_COLOR, 'color');
 
+export const onHighlightModeChange = ActionCreator<IAction>(actions.HIGHLIGHT_MODE_CHANGE, 'mode');
+
 export const onHighlightRemoveOff = ActionCreator<IAction>(actions.HIGHLIGHT_REMOVE_OFF);
 
 export const onHighlightToggleMultipleHighlightRemoval = ActionCreator<IAction>(actions.HIGHLIGHT_REMOVE_MULTIPLE);

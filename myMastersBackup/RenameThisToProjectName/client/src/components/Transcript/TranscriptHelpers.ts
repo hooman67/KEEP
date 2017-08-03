@@ -129,7 +129,7 @@ export function findSearchPhrase (searchArr, transcriptObj) {
  * @param {string} time - time
  * @param {Object[]} transcriptObj - array of objects
  */
-function getClosestTimestamp (transcriptObj, time) {
+export function getClosestTimestamp (transcriptObj, time) {
   let lo = -1;
   let hi = transcriptObj.length;
   while (hi - lo > 1) {
@@ -241,6 +241,7 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
     obj.colors = [];
     obj.comments = [];
     obj.isCommentEnd = false;
+    obj.showInterval = false;
     return obj;
   });
   let i;
@@ -288,16 +289,17 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
     if (commentData && commentData.red) {
       for (i = 0; i < commentData.red.length; i += 1) {
         colorTimeStamps.startTime = commentData.red[i].start;
-        
+
         /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
         const endTime = getClosestTimestamp(transcriptObj, commentData.red[i].end)[1];
 
         /* get transcriptObj id for endTime*/
         const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-  
+
 
         newTranscriptObj[endId].comments.push({
           _id:     commentData.red[i]._id,
+          TimeStamp: commentData.red[i].TimeStamp,
           start:   commentData.red[i].start,
           end:     commentData.red[i].end,
           Color: 'red',
@@ -305,7 +307,7 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
           Parent:  commentData.red[i].Parent,
           Replies: commentData.red[i].Replies,
         });
-        
+
       }
     }
 
@@ -319,12 +321,13 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
 
         /* get transcriptObj id for endTime*/
         const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-  
+
 
         newTranscriptObj[endId].comments.push({
           _id:     commentData.yellow[i]._id,
           start:   commentData.yellow[i].start,
           end:     commentData.yellow[i].end,
+          TimeStamp: commentData.yellow[i].TimeStamp,
           Color: 'yellow',
           Text:    commentData.yellow[i].Text,
           Parent:  commentData.yellow[i].Parent,
@@ -343,12 +346,13 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
 
         /* get transcriptObj id for endTime*/
         const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-  
+
 
         newTranscriptObj[endId].comments.push({
           _id:     commentData.blue[i]._id,
           start:   commentData.blue[i].start,
           end:     commentData.blue[i].end,
+          TimeStamp: commentData.blue[i].TimeStamp,
           Color: 'blue',
           Text:    commentData.blue[i].Text,
           Parent:  commentData.blue[i].Parent,
@@ -365,12 +369,13 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
 
         /* get transcriptObj id for endTime*/
         const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-  
+
 
         newTranscriptObj[endId].comments.push({
           _id:     commentData.green[i]._id,
           start:   commentData.green[i].start,
           end:     commentData.green[i].end,
+          TimeStamp: commentData.green[i].TimeStamp,
           Color: 'green',
           Text:    commentData.green[i].Text,
           Parent:  commentData.green[i].Parent,
@@ -378,7 +383,7 @@ export function addHighLightFlags (transcriptObj, highlightData, commentData) {
         });
       }
     }
-    
+
   return newTranscriptObj;
 }
 /* Creates a div with styles and fonts to check width */

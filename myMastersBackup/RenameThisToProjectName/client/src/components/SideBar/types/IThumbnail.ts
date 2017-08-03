@@ -1,15 +1,4 @@
-import { IBoundaryData, IFilmstripDimensionsData } from './IFilmstripCommon';
 import { ICursorPosition } from '../../../types/ISystemCommon';
-
-// TODO: CHANGE ANY TYPE
-export interface IThumbnailCore {
-  className: string;
-  dimensionsData: IFilmstripDimensionsData;
-  boundaryData: IBoundaryData;
-  thumbnailData: any;
-  cursorPosition: ICursorPosition;
-  commentData: any;
-}
 
 export interface IThumbnailData {
   duration: number;
@@ -33,5 +22,4 @@ export interface IThumbnail {
   };
   data: ISingleThumbnailData;
   src: string;
-  commentData: any;
 }

@@ -1,13 +1,22 @@
 import React, { PureComponent } from 'react';
-import uuid from 'uuid';
+import { DefaultButton, IconButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
+import {
+  VictoryArea,
+} from 'victory';
+import ReactToolTip from 'react-tooltip';
 import {
   IFilmstripDimensionsData,
   ICommentCore,
   ICommentData,
 } from '../../types';
-import {SidebarOpen} from '../../../../layouts/CommandBars/ActiveVideo/sidebarAction';
+import ColorPicker from '../../../ColorPicker';
 
-export default class CommentMapCore extends PureComponent<ICommentCore, any> {
+import {onCommentViewMoreTrue} from '../../../../services/Comment';
+import { connect } from 'react-redux';
+
+// import {editCommentFilmStrip} from '../../../../services/Comment';
+
+class CommentMapCore extends PureComponent<ICommentCore, any> {
   private enlarge: boolean;
   private preEnlarge: boolean;
   private count: number;
@@ -24,25 +33,17 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
     this.count = 1;
   }
 
-    /**
-   * hoverComment() method for showing the comment attributes
-   *
-   * @return Alert
-   */
-
-  onMouseEnterHandler(commentData: ICommentData){
-    console.log("onMouseEnterHandler");
-    this.props.onCommentHover();
-  }
-
-      /**
-   * hoverComment() method for showing the comment attributes
-   *
-   * @return Alert
-   */
-
-  onMouseLeaveHandler(){
-    console.log("Leaving the comment");
+  onClickComment(data: any){
+    this.props.cancelCommentEditFilmstrip();
+    const id = data.onClickData._id;
+    const start = data.onClickData.start;
+    const end = data.onClickData.end;
+    const commentText  = data.onClickData.Text;
+    const Parent = data.onClickData.Parent;
+    const TimeStamp = data.onClickData.TimeStamp;
+    const color = data.fill
+    //send the information to the comment information to the colorpickerstate
+    this.props.editCommentFilmStrip(id, start, end, commentText, Parent, TimeStamp, color);
   }
 
     /**
@@ -66,14 +67,21 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
     }
   }
 
-  saveComment() {
-    const val = (this.refs.newCommentText as HTMLInputElement).value;
-    const uuid1 = uuid.v4();
-    
-    console.log("ss saveComment entered:\n", uuid1, "\n",val);
-    // this.props.onCommentSendText(uuid1 ,120,140,val);
+  onCommentHover(data: any, index: any){
+    data.showTimeRange= true;
+    // console.log(data);
   }
-  
+
+  onCommentHoverLeave(data:any, index: any){
+    data.showTimeRange = false;
+    // console.log(data);
+  }
+
+  onCommentDoubleClick(uuid){
+    this.props.onCommentViewMoreTrue(uuid);
+    // console.log(data);
+  }
+
   /**
    * Renders the component.
    *
@@ -89,25 +97,71 @@ export default class CommentMapCore extends PureComponent<ICommentCore, any> {
       mag = 2;
     }
     return (
-         <svg
+      <div
         className={this.props.className}
-        width={dimensionsData.generalWidth}
-        height={dimensionsData.comment.layerHeight * mag}
       >
         {
-          commentData.map((data) => {
-            return (
-              <foreignObject      
-                x={data.x}
-                y={data.y * mag * dimensionsData.generalHeight}>
+          commentData.map((data, index) => {
+            if(data.showTimeRange == false){
+             return(
+              <div
+              onMouseEnter ={ () => this.onCommentHover(data, this)}
+              onMouseLeave ={ () => this.onCommentHoverLeave(data, this)}
+              onDoubleClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
+              data-tip data-for={data.onClickData._id}
+                >
+               <IconButton
+                  key={index}
+                  style={{position: 'absolute', left: data.x, top: data.y}}
+                  disabled={ false }
+                  iconProps={ { iconName: 'MessageFill' } }
+                  text={data.onClickData.Text}
+                  onClick={ () => this.onClickComment(data)}
+                  />
+
+              </div>
+              );
+            }else if(data.showTimeRange == true){
+              const commentwidth = data.width;
+              const commentoffset = data.x;
+              const color = data.fill;
+
+              return(
+               <div>
+                  <div
+                  onMouseLeave ={ () => this.onCommentHoverLeave(data, this)}
+                  onDoubleClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
+                  style={{background: color, width: commentwidth, left: commentoffset, position: 'absolute'}}
+                  data-tip data-for={data.onClickData._id}
+                  onClick={ () => this.onClickComment(data)}
+                  > .
+                   </div>
                   
-              </foreignObject>
-            );
+                  <ReactToolTip id={data.onClickData._id} type='warning' effect = 'solid' place = 'bottom'>
+                    <div>Hooman Shariati</div>
+                    <div>At:  {data.onClickData.TimeStamp}</div>
+                    <div>{data.onClickData.Text}</div>
+                  </ReactToolTip>
+               </div>
+
+
+
+
+              );
+            }
+
           })
+
         }
-      </svg>
+
+      </div>
     );
-    
+
   }
 }
 
+const actions = {
+  onCommentViewMoreTrue,
+};
+
+export default connect(null, actions)(CommentMapCore);

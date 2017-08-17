@@ -50,6 +50,7 @@ export interface ITranscriptProps {
   onCommentSendText: Function;
   onCommentEditText: Function;
   onCommentDeleteText: Function;
+  onCommentCancelText: Function;
   onCommentReply: Function;
   onCommentSelectSectionClear: Function;
   onVideoPlayerSeek: Function;

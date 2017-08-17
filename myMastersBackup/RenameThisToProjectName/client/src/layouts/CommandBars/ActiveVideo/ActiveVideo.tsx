@@ -152,13 +152,13 @@ class ActiveVideoCommandBar extends Component<any, any> {
           ? <PrimaryButton
             disabled={ false }
             styles = {style1}
-            text='Collapse'
+            text='Collapse Comments'
             onClick={ this.handleClickExpand.bind(this) }>
           </PrimaryButton>
           : <DefaultButton
             disabled={ false }
             styles = {style1}
-            text='Expand'
+            text='Expand Comments'
             onClick={  this.handleClickExpand.bind(this)  }>
           </DefaultButton>;
 

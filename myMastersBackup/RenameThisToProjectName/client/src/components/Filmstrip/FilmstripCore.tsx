@@ -21,7 +21,8 @@ import {
   onCommentSendFilmStripText,
   onCommentSelectSectionEndFS,
   editCommentFilmStrip,
-  cancelCommentEditFilmstrip
+  onCommentDeleteText,
+  onCommentCancelText
 } from '../../services/Comment';
 import {
   onVideoPlayerPlayHighlightStart,
@@ -75,7 +76,8 @@ class FilmstripCore extends Component<any, any> {
                     onCommentSendFilmStripText: this.props.onCommentSendFilmStripText,
                     onCommentSelectSectionEndFS: this.props.onCommentSelectSectionEndFS,
                     editCommentFilmStrip: this.props.editCommentFilmStrip,
-                    cancelCommentEditFilmstrip: this.props.cancelCommentEditFilmstrip,
+                    onCommentDeleteText: this.props.onCommentDeleteText,
+                    onCommentCancelText: this.props.onCommentCancelText,
                   }}
                   inputData={data}
                 />
@@ -107,7 +109,8 @@ const actions = {
   onCommentSendFilmStripText,
   onCommentSelectSectionEndFS,
   editCommentFilmStrip,
-  cancelCommentEditFilmstrip
+  onCommentDeleteText,
+  onCommentCancelText,
 };
 
 function mapStateToProps (state) {

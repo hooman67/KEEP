@@ -14,10 +14,17 @@ export interface ICommentCore {
   commentData: ICommentData[];
   onVideoPlayerPlayCommentClick: Function;
   className: string;
-  onCommentHover: Function;
   editCommentFilmStrip: Function;
   cancelCommentEditFilmstrip: Function;
   onCommentViewMoreTrue: any;
+  onCommentHover: any;
+  onCommentNotHover: any;
+  showCommentIntervalWord: any;
+  hideCommentIntervalWord: any;
+  SidebarOpen: any;
+  transcriptUpdate: any;
+  transcriptObj: Array<any>;
+
 }
 
 export interface ICommentProps{
@@ -33,7 +40,6 @@ export interface ICommentData {
   width: number;
   height: number;
   fill: string;
-  showTimeRange: boolean,
   onClickData: {
     _id: string,
     start: number,
@@ -41,5 +47,7 @@ export interface ICommentData {
     Text: string,
     Parent: string,
     TimeStamp: string,
+    showTimeRange: boolean,
+    Replies: IComment[],
   };
 }

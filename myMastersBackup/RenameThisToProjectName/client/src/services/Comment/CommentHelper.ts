@@ -18,8 +18,10 @@ export const commentNormalize = (comments: Array<IComment>) => {
       end: comment.TimeRange.end,
       Color: comment.Color,
       Text: comment.Text,
+      PreviousText: comment.PreviousText,
       Parent: comment.Parent,
       Replies: comment.Replies,
+      showTimeRange: false,
     });
   });
   return result;
@@ -38,6 +40,7 @@ export const updateCommentStateWithReplyAndText = (oldComments, newComment) => {
   if ( parentIndex !== -1){
     const replyIndex = oldComments[parentIndex].Replies.findIndex(isSameId);
     if(replyIndex !== -1 ){
+      oldComments[parentIndex].Replies[replyIndex].PreviousText = oldComments[parentIndex].Replies[replyIndex].Text;
       oldComments[parentIndex].Replies[replyIndex].Text = newComment.Text;
     }else{
       console.log('hs Error: Could not find this reply in the parents list');
@@ -81,11 +84,26 @@ export const updateCommentStateWithText = (oldComments, newComment) => {
   const targetIndex = oldComments.findIndex(isSameId);
 
   if ( targetIndex !== -1){
+    oldComments[targetIndex].PreviousText = oldComments[targetIndex].Text;
     oldComments[targetIndex].Text = newComment.Text;
   }
 
   return oldComments;
 };
+
+export const updateCommentStateWithHover = (oldComments, newComment) => {
+  function isSameId(element){
+    return element._id === newComment.uuid;
+  }
+
+  const targetIndex = oldComments.findIndex(isSameId);
+
+  if(targetIndex !== -1){
+    oldComments[targetIndex].showTimeRange = newComment.showTimeRange;
+  }
+
+  return oldComments;
+}
 
 
 export const updateCommentStateWithCommentRemove = (oldComments, newComment) => {
@@ -143,6 +161,7 @@ export const commentGenerateDiff = (newComments, preComments, color) => {
           end: comment.end,
         },
         Color: color,
+        PreviousText: comment.PreviousText,
         Text: comment.Text,
       });
     }

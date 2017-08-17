@@ -49,7 +49,8 @@ export type TFilmstripActions = {
   onCommentSendFilmStripText: Function;
   onCommentSelectSectionEndFS: Function;
   editCommentFilmStrip: Function;
-  cancelCommentEditFilmstrip: Function;
+  onCommentDeleteText: Function;
+  onCommentCancelText: Function;
 };
 
 export interface IFilmstrip {

@@ -7,11 +7,13 @@ export interface IComment {
     end: Number;
   };
   Text: string;
+  PreviousText: string;
   Parent: string;
   //Replies: Array<string>;
   //Below works if you change the CommentHelper.ts aswell
   Replies: Array<IComment>;
   commentExpandAll: boolean;
+  showTimeRange: boolean;
 }
 
 /**
@@ -25,8 +27,9 @@ export interface ICommentSelectSection{
 
 export interface IColorPickerData{
   TimeStamp: string;
-  Color: string,
-  Text: string,
+  Color: string;
+  Text: string;
+  PreviousText: string;
   Parent: string;
   TimeRange: {
     start: Number;

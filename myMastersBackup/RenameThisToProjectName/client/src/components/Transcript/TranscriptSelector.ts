@@ -7,7 +7,7 @@ const getCommentState = state => state.activeVideo.comment ? state.activeVideo.c
 
 const getModifiedTranscriptState =
 (getTranscriptState, getHighlightState, getCommentState) =>
- getTranscriptState !== null ? addHighLightFlags(getTranscriptState, getHighlightState, getCommentState) : null;
+ getTranscriptState != null ? addHighLightFlags(getTranscriptState, getHighlightState, getCommentState) : null;
 
 export const transcriptSelector = createSelector(
   getTranscriptState,

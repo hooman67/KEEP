@@ -11,10 +11,15 @@ import {
 } from '../../types';
 import ColorPicker from '../../../ColorPicker';
 
-import {onCommentViewMoreTrue} from '../../../../services/Comment';
+import {onCommentViewMoreTrue, onCommentHover, onCommentNotHover} from '../../../../services/Comment';
 import { connect } from 'react-redux';
 
-// import {editCommentFilmStrip} from '../../../../services/Comment';
+
+import {showCommentIntervalWord, hideCommentIntervalWord} from '../../../Transcript';
+
+import {transcriptUpdate} from '../../../Transcript';
+
+
 
 class CommentMapCore extends PureComponent<ICommentCore, any> {
   private enlarge: boolean;
@@ -67,14 +72,28 @@ class CommentMapCore extends PureComponent<ICommentCore, any> {
     }
   }
 
-  onCommentHover(data: any, index: any){
-    data.showTimeRange= true;
+  onCommentHover(data: any, start, end){
+    this.props.onCommentHover(data.onClickData._id, true, data.fill);
     // console.log(data);
+
+    if(this.props.transcriptObj.length > 0){
+      this.props.showCommentIntervalWord(start, end);
+    }
+    console.log(start, end, 'Entered show interval function');
+    this.props.transcriptUpdate();
+
   }
 
-  onCommentHoverLeave(data:any, index: any){
-    data.showTimeRange = false;
+  onCommentHoverLeave(data:any, start, end){
     // console.log(data);
+    this.props.onCommentNotHover(data.onClickData._id, false, data.fill);
+
+    if(this.props.transcriptObj.length > 0){
+      this.props.hideCommentIntervalWord(start, end);
+    }
+    console.log('Entered hide');
+    this.props.transcriptUpdate();
+
   }
 
   onCommentDoubleClick(uuid){
@@ -102,12 +121,12 @@ class CommentMapCore extends PureComponent<ICommentCore, any> {
       >
         {
           commentData.map((data, index) => {
-            if(data.showTimeRange == false){
+            if(data.onClickData.showTimeRange == false){
              return(
               <div
-              onMouseEnter ={ () => this.onCommentHover(data, this)}
-              onMouseLeave ={ () => this.onCommentHoverLeave(data, this)}
-              onDoubleClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
+              onMouseEnter ={ () => this.onCommentHover(data, data.onClickData.start, data.onClickData.end)}
+              onMouseLeave ={ () => this.onCommentHoverLeave(data, data.onClickData.start, data.onClickData.end)}
+              onClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
               data-tip data-for={data.onClickData._id}
                 >
                <IconButton
@@ -116,31 +135,38 @@ class CommentMapCore extends PureComponent<ICommentCore, any> {
                   disabled={ false }
                   iconProps={ { iconName: 'MessageFill' } }
                   text={data.onClickData.Text}
-                  onClick={ () => this.onClickComment(data)}
+                  onDoubleClick={ () => this.onClickComment(data)}
                   />
 
               </div>
               );
-            }else if(data.showTimeRange == true){
+            }else if(data.onClickData.showTimeRange == true){
               const commentwidth = data.width;
               const commentoffset = data.x;
               const color = data.fill;
+              let numberOfReplies;
+              if(data.onClickData.Replies){
+                numberOfReplies = data.onClickData.Replies.length;
+              }else{
+                numberOfReplies = "couldn't determine";
+              }
 
               return(
                <div>
                   <div
-                  onMouseLeave ={ () => this.onCommentHoverLeave(data, this)}
-                  onDoubleClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
+                  onMouseLeave ={ () => this.onCommentHoverLeave(data, data.onClickData.start, data.onClickData.end)}
+                  onClick = {() => this.onCommentDoubleClick(data.onClickData._id)}
                   style={{background: color, width: commentwidth, left: commentoffset, position: 'absolute'}}
                   data-tip data-for={data.onClickData._id}
-                  onClick={ () => this.onClickComment(data)}
+                  onDoubleClick={ () => this.onClickComment(data)}
                   > .
                    </div>
-                  
+
                   <ReactToolTip id={data.onClickData._id} type='warning' effect = 'solid' place = 'bottom'>
-                    <div>Hooman Shariati</div>
+                    <div>John Smith</div>
                     <div>At:  {data.onClickData.TimeStamp}</div>
                     <div>{data.onClickData.Text}</div>
+                    <div>Number of Replies: {numberOfReplies}</div>
                   </ReactToolTip>
                </div>
 
@@ -162,6 +188,17 @@ class CommentMapCore extends PureComponent<ICommentCore, any> {
 
 const actions = {
   onCommentViewMoreTrue,
+  onCommentHover,
+  onCommentNotHover,
+  transcriptUpdate,
+  showCommentIntervalWord,
+  hideCommentIntervalWord,
 };
 
-export default connect(null, actions)(CommentMapCore);
+function mapStateToProps (state) {
+  return {
+      transcriptObj: state.activeVideo.transcript.transcriptObj,
+  };
+}
+
+export default connect(mapStateToProps, actions)(CommentMapCore);

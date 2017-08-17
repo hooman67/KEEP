@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
-import {Tabs, Tab} from 'react-bootstrap';
+import {Tabs, Tab, Navbar, Nav, NavItem} from 'react-bootstrap';
 import SideBar from './SideBar';
 import SideBarComment from './SideBarComment';
 import { connect } from 'react-redux';
 import CommentViewMore from './CommentViewMore';
 import {
   Transcript,
+  transcriptWidth
 } from '../Transcript';
+
+
 
 import {
   onCommentViewMoreFalse
 } from '../../services/Comment';
+import styles from './styles.css';
 
 class SideBarOverlay extends Component<any, any> {
 
@@ -44,16 +48,46 @@ class SideBarOverlay extends Component<any, any> {
 
 
   render () {
+const left = window.innerWidth - (this.props.transcriptWidth) -20;
+const navbarInstance = (
+  <Navbar  style = {{top: '90px', left: (left), width: (this.props.transcriptWidth)}}  fixedTop pullRight>
 
-const activeKeyComment = (this.props.comment.commentViewMore)? 2: 4;
+      <Nav bsStyle="pills"  activeKey={this.state.key} onSelect={this.handleSelect.bind(this)}>
+        <NavItem eventKey={1} title="Highlights">Highlights</NavItem>
+        <NavItem eventKey={2} title="Comments">Comments</NavItem>
+        <NavItem eventKey={3} title="Annotations">Annotations</NavItem>
+        <NavItem eventKey={4} title="Transcript"> Transcript</NavItem>
+      </Nav>
+
+  </Navbar>
+);
+
+let display;
+
+if (this.state.key == 1){
+  display = <SideBar />
+}
+else if (this.state.key == 2){
+  display =  (this.props.comment.commentViewMore)?(<CommentViewMore/>):<SideBarComment />
+
+}
+
+else if (this.state.key == 3){
+  display = <div>There are no annotations added! </div>
+}
+
+else if (this.state.key == 4){
+  display = <Transcript currentTime={this.props.currentTime} onViewMore = {this.handleViewMore.bind(this)} transcriptUpdate = {this.props.transcriptUpdate}/>
+}
+
 
 return (
-  <Tabs  activeKey={this.state.key} onSelect={this.handleSelect.bind(this)} id="controlled-tab-example">
-    <Tab eventKey={1} title="Highlights"><SideBar /></Tab>
-    <Tab eventKey={2} title="Comments">   { (this.props.comment.commentViewMore)?(<CommentViewMore/>):<SideBarComment />}</Tab>
-    <Tab eventKey={3} title="Annotations"> There are no annotations added! </Tab>
-    <Tab eventKey={4} title="Transcript"> <Transcript currentTime={this.props.currentTime} onViewMore = {this.handleViewMore.bind(this)} transcriptUpdate = {this.props.transcriptUpdate}/> </Tab>
-  </Tabs>
+  <div>
+  {navbarInstance}
+  <div style = {{position: 'relative', top: '50px'}}>
+    {display}
+  </div>
+  </div>
 );
 }
 
@@ -69,6 +103,7 @@ function mapStateToProps (state) {
     comment: state.activeVideo.comment,
       transcriptUpdate: state.activeVideo.transcript.transcriptUpdate,
       transcriptObj: state.activeVideo.transcript.transcriptObj,
+      transcriptWidth: state.activeVideo.transcript.transcriptWidth,
       currentTime: state.activeVideo.player.currentTime,
 
   };

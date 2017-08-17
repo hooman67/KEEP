@@ -18,6 +18,7 @@ export interface IComment extends mongoose.Types.Subdocument {
     end: number;
   };
   Text: string;
+  PreviousText: string;
   Parent: string;
   //Replies: Array<string>;
   //Below works if you change the CommentHelper.ts aswell

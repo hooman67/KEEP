@@ -1,0 +1,17 @@
+# Dependency directories
+node_modules/
+
+# IntelliJ IDEA directories
+\.idea/
+
+# MacOS System
+.DS_Store
+
+# npm-debug log
+npm-debug.log
+
+# awesome-typescript-loader cache file folder
+\.awcache/
+
+# production build
+dist/

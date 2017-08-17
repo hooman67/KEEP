@@ -57,7 +57,7 @@ export default (state = INITIAL_STATE, action) => {
 
     // TODO: Clean Up Code
     case actions.HIGHLIGHT_SEND_SELECTION:
-      const selectSection = {
+      const selectSectionUpdate = {
         selectSectionStartTime: action.startTime,
         selectSectionEndTime: action.endTime,
         status: 'end',
@@ -86,7 +86,7 @@ export default (state = INITIAL_STATE, action) => {
           ...state,
           highlightData: newHighlights,
           highlightUpdate,
-          selectSection,
+          selectSection: selectSectionUpdate,
         };
       }
       if (state.highlightingMode) {
@@ -103,7 +103,7 @@ export default (state = INITIAL_STATE, action) => {
               [state.activeHighlightColor]: highlightsWithUUID,
             },
             highlightUpdate,
-            selectSection,
+            selectSection: selectSectionUpdate,
           };
         } else if (!state.removeHighLight) {
           const mergedHighlight = highlightMergeIntervals([...state.highlightData[state.activeHighlightColor], {
@@ -118,13 +118,13 @@ export default (state = INITIAL_STATE, action) => {
               [state.activeHighlightColor]: highlightsWithUUID,
             },
             highlightUpdate,
-            selectSection,
+            selectSection: selectSectionUpdate,
           };
         }
       }
       return {
         ...state,
-        selectSection,
+        selectSection: selectSectionUpdate,
       };
 
     case actions.HIGHLIGHT_REMOVE_OFF:

@@ -14,5 +14,7 @@ export interface IColorPicker {
   activeCommentColor: any;
   filmstripDimensions: IFilmstripDimensionsData;
   editCommentFilmStripFinish: Function;
-  cancelCommentEditFilmstrip: Function;
+  onCommentDeleteText: Function;
+  onCommentCancelText: Function;
+  commentMousePosition: any;
 }

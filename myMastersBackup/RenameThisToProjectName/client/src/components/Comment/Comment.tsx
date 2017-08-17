@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { ICommentProps } from './types';
 import styles from './styles.css';
 import { getCSSColor } from '../Transcript/TranscriptHelpers';
-
+import { onCommentHover, onCommentNotHover } from '../../services/Comment';
 import {
   IAction,
   ActionCreator,
@@ -22,10 +22,18 @@ import {SidebarOpen} from '../../layouts/CommandBars/ActiveVideo/sidebarAction';
 
 import {transcriptUpdate} from '../Transcript';
 
+import ThumbnailSorter from '../SideBar/components/ThumbnailSorter';
+
+import {thumbnail} from '../SideBar/components/ThumbnailData';
+
+import {ISingleThumbnailData, IThumbnailData} from '../SideBar/types/IThumbnail';
+
+import ReactCursorPosition from 'react-cursor-position';
 
 class Comment extends Component<ICommentProps, any> {
   constructor (props: any) {
     super(props);
+    this.cancelComment = this.cancelComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
     this.editComment = this.editComment.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
@@ -34,7 +42,10 @@ class Comment extends Component<ICommentProps, any> {
     this.generateCommentsReplies = this.generateCommentsReplies.bind(this);
     this.viewMore = this.viewMore.bind(this);
     this.getBackgroundColor = this.getBackgroundColor.bind(this);
+    this.calculateThumbnail = this.calculateThumbnail.bind(this);
   }
+
+
 
   editComment(uuid, start, end, parent) {
       this.props.action.onCommentEditText(uuid, start, end, "", parent);
@@ -49,14 +60,19 @@ class Comment extends Component<ICommentProps, any> {
     this.props.action.onCommentSelectSectionEnd(uuid, start, end);
   }
 
-
-  saveComment(uuid, start, end, parent, timeStamp) {
+  saveComment(uuid, start, end, parent, timeStamp, previousText) {
     const val = (this.refs.newCommentText as HTMLInputElement).value;
 
     console.log("hs saveComment entered:\n", uuid, "\n",val);
 
-    this.props.action.onCommentSendText(uuid, start, end, val, parent, timeStamp);
+    this.props.action.onCommentSendText(uuid, start, end, val, previousText, parent, timeStamp);
   }
+
+  cancelComment(uuid, start, end, parent, timeStamp, prevText){
+    this.props.action.onCommentCancelText(uuid, start, end, prevText, parent);
+  }
+
+
 
   getBackgroundColor (colour, parent) {
   if(parent){
@@ -89,25 +105,29 @@ class Comment extends Component<ICommentProps, any> {
 
 }
 
+  calculateThumbnail(startTime: number): ISingleThumbnailData{
+    const thumbnailData: IThumbnailData = thumbnail;
+    return thumbnailData.coordinates[Math.floor((startTime / thumbnailData.duration) * thumbnailData.coordinates.length)];
+  }
 
   viewMore(uuid) {
-
-    console.log("View More entered:\n");
-
     this.props.action.onCommentViewMore(uuid);
   }
 
-  showInterval(start, end){
-    this.props.showCommentIntervalWord(start, end);
-    console.log(start, end, 'Entered show interval function');
+  showInterval(uuid,start, end, color){
+    this.props.onCommentHover(uuid, true, color);
+    if(this.props.transcriptObj.length > 0){
+      this.props.showCommentIntervalWord(start, end);
+    }
     this.props.SidebarOpen();
     this.props.transcriptUpdate();
-
   }
 
-  hideInterval(start, end){
-    this.props.hideCommentIntervalWord(start, end);
-    console.log('Entered hide');
+  hideInterval(uuid,start, end, color){
+    this.props.onCommentNotHover(uuid, false, color);
+    if(this.props.transcriptObj.length > 0){
+      this.props.hideCommentIntervalWord(start, end);
+    }
     this.props.SidebarOpen();
     this.props.transcriptUpdate();
   }
@@ -120,9 +140,21 @@ class Comment extends Component<ICommentProps, any> {
       if (index < 1){
         if(comment.Text == ""){
           return(
-            <div>
-              <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-              <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}}  onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp)}>Save</DefaultButton>
+            <div style = {{'width': '100%'}}>
+              <textarea  ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+
+               <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'MessageFill' }}
+                onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
+              <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'Cancel' }}
+                onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
             </div>
           );
           ///
@@ -130,7 +162,12 @@ class Comment extends Component<ICommentProps, any> {
           return(
             <div className={styles.replyBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
 
-              <div>Hooman Shariati</div>
+               <div style={{height: 150, width: 200}}>
+                 <ReactCursorPosition>
+                    <ThumbnailSorter start={comment.start} end={comment.end} />
+                  </ReactCursorPosition>
+                 </div>
+              <div>John Smith</div>
               <div>At:  {comment.TimeStamp}</div>
               <div>To:  {comment.Parent}</div>
               <br></br>
@@ -151,9 +188,21 @@ class Comment extends Component<ICommentProps, any> {
     else if (index == 1){
       if(comment.Text == ""){
         return(
-          <div>
-            <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-            <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}}  onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp)}>Save</DefaultButton>
+          <div style = {{'width': '100%'}}>
+            <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+
+              <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'MessageFill' }}
+                onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
+              <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'Cancel' }}
+                onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
           </div>
         );
         ///
@@ -173,9 +222,21 @@ class Comment extends Component<ICommentProps, any> {
   else {
     if(comment.Text == ""){
       return(
-        <div>
-          <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-          <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}}  onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp)}>Save</DefaultButton>
+        <div style = {{'width': '100%'}}>
+          <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+
+            <IconButton
+              className={styles.icon}
+              iconProps={{ iconName: 'MessageFill' }}
+              onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+            />
+
+            <IconButton
+              className={styles.icon}
+              iconProps={{ iconName: 'Cancel' }}
+              onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+            />
+
         </div>
       );
       ///
@@ -206,9 +267,21 @@ class Comment extends Component<ICommentProps, any> {
           if(comment.Text == "" ){
             return(
               <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                <div>
-                  <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-                  <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}}  onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp)}>Save</DefaultButton>
+                <div style = {{'width': '100%'}}>
+                  <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+
+                  <IconButton
+                    className={styles.icon}
+                    iconProps={{ iconName: 'MessageFill' }}
+                     onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                  />
+
+                  <IconButton
+                    className={styles.icon}
+                    iconProps={{ iconName: 'Cancel' }}
+                    onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                  />
+
                 </div>
                 {this.generateCommentsReplies(comment.Replies, comment._id)}
               </div>
@@ -216,7 +289,14 @@ class Comment extends Component<ICommentProps, any> {
           }else{
             return(
               <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                <div>Hooman Shariati</div>
+
+              <div style={{height: 150, width: 200}}>
+                <ReactCursorPosition>
+                      <ThumbnailSorter start={comment.start} end={comment.end} />
+                </ReactCursorPosition>
+              </div>
+
+                <div>John Smith</div>
                 <div>At:  {comment.TimeStamp}</div>
                 <div>To:  {comment.Parent}</div>
                 <br></br>
@@ -239,7 +319,7 @@ class Comment extends Component<ICommentProps, any> {
               <IconButton
                       data-tip
                       data-for= {comment._id + "#TS"}
-                      onDoubleClick = {() => this.viewMore(comment._id)}
+                      onClick = {() => this.viewMore(comment._id)}
                       disabled={ false }
                       iconProps={ { iconName: 'Chat',
                                     style: {
@@ -248,11 +328,11 @@ class Comment extends Component<ICommentProps, any> {
                                 } }
                       title='View Comment'
                       ariaLabel='View Comment'
-                      onMouseEnter = {() => this.showInterval(comment.start, comment.end)}
-                      onMouseLeave = {() => this.hideInterval(comment.start, comment.end)}
+                      onMouseEnter = {() => this.showInterval(comment._id, comment.start, comment.end, comment.Color)}
+                      onMouseLeave = {() => this.hideInterval(comment._id,comment.start, comment.end, comment.Color)}
                       />
               <ReactTooltip id = {comment._id + "#TS"} type='warning' effect = 'solid' place = 'bottom' style={{opacity: 1}}>
-                <div>Hooman Shariati</div>
+                <div>John Smith</div>
                 <div>At:  {comment.TimeStamp}</div>
                 <div>{comment.Text}</div>
                 <div> Number of Replies: {comment.Replies.length}</div>
@@ -265,9 +345,21 @@ class Comment extends Component<ICommentProps, any> {
       }else{
         if(comment.Text == ""){
           return(
-            <div>
-                <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-                <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}}  onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp)}>Save</DefaultButton>
+            <div style = {{'width': '100%'}}>
+                <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+
+                  <IconButton
+                    className={styles.icon}
+                    iconProps={{ iconName: 'MessageFill' }}
+                    onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                  />
+
+                  <IconButton
+                    className={styles.icon}
+                    iconProps={{ iconName: 'Cancel' }}
+                    onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                  />
+
             </div>
           );
           ///
@@ -275,7 +367,13 @@ class Comment extends Component<ICommentProps, any> {
           if (this.props.commentExpandAll){
             return(
               <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                <div>Hooman Shariati</div>
+              <div style={{height: 150, width: 200}}>
+                <ReactCursorPosition>
+                  <ThumbnailSorter start={comment.start} end={comment.end} />
+                </ReactCursorPosition>
+              </div>
+
+                <div>John Smith</div>
                 <div>At:  {comment.TimeStamp}</div>
                 <div>To:  {comment.Parent}</div>
                 <br></br>
@@ -296,7 +394,7 @@ class Comment extends Component<ICommentProps, any> {
             <IconButton
                 data-tip
                 data-for= {comment._id + "#TS"}
-                onDoubleClick = {() => this.viewMore(comment._id)}
+                onClick = {() => this.viewMore(comment._id)}
                 disabled={ false }
                 iconProps={ { iconName: 'Chat',
                               style: {
@@ -305,11 +403,11 @@ class Comment extends Component<ICommentProps, any> {
                           } }
                 title='View Comment'
                 ariaLabel='View Comment'
-                onMouseEnter = {() => this.showInterval(comment.start, comment.end)}
-                onMouseLeave = {() => this.hideInterval(comment.start, comment.end)}
+                onMouseEnter = {() => this.showInterval(comment._id,comment.start, comment.end, comment.Color)}
+                onMouseLeave = {() => this.hideInterval(comment._id,comment.start, comment.end, comment.Color)}
             />
             <ReactTooltip id= {comment._id + "#TS"} type='warning' effect = 'solid' place = 'bottom' style={{opacity: 1}}>
-              <div>Hooman Shariati</div>
+              <div>John Smith</div>
               <div>At:  {comment.TimeStamp}</div>
               <div>{comment.Text}</div>
               <div> Number of Replies: 0</div>
@@ -348,11 +446,14 @@ const actions = {
   hideCommentIntervalWord,
   SidebarOpen,
   transcriptUpdate,
+  onCommentHover,
+  onCommentNotHover,
 };
 
 function mapStateToProps (state) {
   return {
       commentExpandAll: state.activeVideo.comment.commentExpandAll,
+      transcriptObj: state.activeVideo.transcript.transcriptObj,
   };
 }
 

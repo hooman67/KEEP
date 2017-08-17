@@ -11,12 +11,26 @@ import {
   onCommentSendText,
   onCommentEditText,
   onCommentDeleteText,
+  onCommentCancelText,
   onCommentSelectSectionClear,
   onCommentViewMoreFalse
 } from '../../services/Comment';
 
 import {SidebarOpen} from '../../layouts/CommandBars/ActiveVideo/sidebarAction';
 
+import {thumbnail} from './components/ThumbnailData';
+
+import {ICursorPosition} from '../../types';
+
+import ReactCursorPosition from 'react-cursor-position';
+
+import {ISingleThumbnailData, IThumbnailData} from './types/IThumbnail';
+
+import ThumbnailSorter from './components/ThumbnailSorter';
+
+import {
+  DefaultButton, PrimaryButton, IconButton, IButtonProps
+} from 'office-ui-fabric-react/lib/Button';
 
 import styles from './styles.css';
 
@@ -25,14 +39,17 @@ class CommentViewMore extends Component<any, any>  {
 
   constructor (props: any) {
     super(props);
+    this.cancelComment = this.cancelComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
     this.editComment = this.editComment.bind(this);
     this.deleteComment = this.deleteComment.bind(this);
     this.replyComment = this.replyComment.bind(this);
     this.generateCommentsReplies = this.generateCommentsReplies.bind(this);
-      this.getBackgroundColor = this.getBackgroundColor.bind(this);
+    this.getBackgroundColor = this.getBackgroundColor.bind(this);
 
   }
+
+
 
   editComment(uuid, start, end, parent) {
       this.props.onCommentEditText(uuid, start, end, "", parent);
@@ -47,13 +64,16 @@ class CommentViewMore extends Component<any, any>  {
     this.props.onCommentSelectSectionEnd(uuid, start, end);
   }
 
-
-  saveComment(uuid, start, end, parent) {
+  saveComment(uuid, start, end, parent, timeStamp, previousText) {
     const val = (this.refs.newCommentText as HTMLInputElement).value;
 
     console.log("hs saveComment entered:\n", uuid, "\n",val);
 
-    this.props.onCommentSendText(uuid, start, end, val, parent);
+    this.props.onCommentSendText(uuid, start, end, val, previousText, parent, timeStamp);
+  }
+
+  cancelComment(uuid, start, end, parent, timeStamp, prevText){
+    this.props.onCommentCancelText(uuid, start, end, prevText, parent);
   }
 
 
@@ -100,16 +120,28 @@ class CommentViewMore extends Component<any, any>  {
     const result = (comments).map(comment => {
       if(comment.Text == ""){
         return(
-          <div>
-            <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-            <button onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent)}>Save</button>
+          <div style = {{'width': '100%'}}>
+            <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+     
+              <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'MessageFill' }}
+                onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
+              <IconButton
+                className={styles.icon}
+                iconProps={{ iconName: 'Cancel' }}
+                onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+              />
+
           </div>
         );
       }else{
         return(
           <div className={styles.replyBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
 
-            <div>Hooman Shariati</div>
+            <div>John Smith</div>
             <div>At:  {comment.TimeStamp}</div>
             <div>To:  {comment.Parent}</div>
             <br></br>
@@ -117,8 +149,8 @@ class CommentViewMore extends Component<any, any>  {
             <div>{comment.Text}</div>
 
             <div  style={{'margin-top':'10px'}}>
-              <button onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</button>
-              <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
+              <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</DefaultButton>
+              <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</DefaultButton>
             </div>
 
           </div>
@@ -132,6 +164,16 @@ class CommentViewMore extends Component<any, any>  {
     );
 
   }
+
+  /**
+ * @return Thumbnail coordinate information
+ */
+
+  calculateThumbnail(startTime: number): ISingleThumbnailData{
+    const thumbnailData: IThumbnailData = thumbnail;
+    return thumbnailData.coordinates[Math.floor((startTime / thumbnailData.duration) * thumbnailData.coordinates.length)];
+  }
+
 
 
 render(){
@@ -178,11 +220,23 @@ for (let key in currentCommentArray) {
             if(comment.Text == "" ){
               return(
               <div>
-                <button style = {{'width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</button>
+                <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px','width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</DefaultButton>
                 <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                  <div>
-                    <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-                    <button onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent)}>Save</button>
+                  <div style = {{'width': '100%'}}>
+                    <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+     
+                    <IconButton
+                      className={styles.icon}
+                      iconProps={{ iconName: 'MessageFill' }}
+                      onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                    />
+
+                    <IconButton
+                      className={styles.icon}
+                      iconProps={{ iconName: 'Cancel' }}
+                      onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                    />
+
                   </div>
                   {this.generateCommentsReplies(comment.Replies)}
                 </div>
@@ -191,9 +245,14 @@ for (let key in currentCommentArray) {
             }else{
               return(
               <div>
-                <button style = {{'width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</button>
+                <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px','width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</DefaultButton>
                 <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                  <div>Hooman Shariati</div>
+                  <div onClick = { () => this.props.onVideoPlayerPlayCommentClick(this.props.comment.commentData, this.props.Color, this.props.commentIndex)} style={{height: 150, width: 200}}>
+                        <ReactCursorPosition>
+                          <ThumbnailSorter start={comment.start} end={comment.end} />
+                        </ReactCursorPosition>
+                  </div>
+                  <div>John Smith</div>
                   <div>At:  {comment.TimeStamp}</div>
                   <div>To:  {comment.Parent}</div>
                   <br></br>
@@ -201,12 +260,9 @@ for (let key in currentCommentArray) {
 
                   {this.generateCommentsReplies(comment.Replies)}
                   <div style={{'margin-top':'10px'}}>
-                    <button onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</button>
-                    <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
-                    <button onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</button>
-                    <button className='link'  onClick = { () => this.props.onVideoPlayerPlayCommentClick(this.props.comment.commentData, colorToUpdate, indexToUpdateGlobal)}>
-                            Play Segment
-                    </button>
+                    <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</DefaultButton>
+                    <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</DefaultButton>
+                    <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</DefaultButton>
                   </div>
                 </div>
               </div>
@@ -221,30 +277,45 @@ for (let key in currentCommentArray) {
       if(comment.Text == ""){
                 return(
                 <div>
-                  <button style = {{'width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</button>
-                  <div>
-                      <textarea ref="newCommentText" defaultValue={comment.Text}></textarea>
-                      <button onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent)}>Save</button>
+                  <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px','width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</DefaultButton>
+                  <div style = {{'width': '100%'}}>
+                      <textarea ref="newCommentText" defaultValue={comment.Text} style={{backgroundColor:this.getBackgroundColor(comment.Color, false),'color':'black', 'width': '100%'}}></textarea>
+     
+                      <IconButton
+                        className={styles.icon}
+                        iconProps={{ iconName: 'MessageFill' }}
+                        onClick={() => this.saveComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                      />
+
+                      <IconButton
+                        className={styles.icon}
+                        iconProps={{ iconName: 'Cancel' }}
+                        onClick={() => this.cancelComment(comment._id, comment.start, comment.end, comment.Parent, comment.TimeStamp, comment.PreviousText)}
+                      />
+
                   </div>
                 </div>
                 );
               }else{
                 return(
                 <div>
-                  <button style = {{'width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</button>
+                  <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px','width': '100%'}} onClick={() => this.closeViewMore()}>View All Comments</DefaultButton>
                   <div className={styles.commentBlock} style={{backgroundColor: this.getBackgroundColor(comment.Color, comment.Parent)}}>
-                    <div>Hooman Shariati</div>
+                    <div onClick = { () => this.props.onVideoPlayerPlayCommentClick(this.props.comment.commentData, this.props.Color, this.props.commentIndex)} style={{height: 150, width: 200}}>
+                        <ReactCursorPosition>
+                          <ThumbnailSorter start={comment.start} end={comment.end} />
+                        </ReactCursorPosition>
+                    </div>
+
+                    <div>John Smith</div>
                     <div>At:  {comment.TimeStamp}</div>
                     <div>To:  {comment.Parent}</div>
                     <br></br>
                     <div>{comment.Text}</div>
                     <div style={{'margin-top':'10px'}}>
-                      <button onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</button>
-                      <button onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</button>
-                      <button onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</button>
-                      <button className='link'  onClick = { () => this.props.onVideoPlayerPlayCommentClick(this.props.comment.commentData, colorToUpdate, indexToUpdateGlobal)}>
-                              Play Segment
-                      </button>
+                      <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.editComment(comment._id, comment.start, comment.end, comment.Parent)}>Edit</DefaultButton>
+                      <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.deleteComment(comment._id, comment.start, comment.end, comment.Parent)}>Delete</DefaultButton>
+                      <DefaultButton style={{'border':'2px #ccc solid', 'margin':'1px'}} onClick={() => this.replyComment(comment._id, comment.start, comment.end)}>Reply</DefaultButton>
                     </div>
                   </div>
                 </div>
@@ -269,6 +340,7 @@ const actions = {
   onCommentSendText,
   onCommentEditText,
   onCommentDeleteText,
+  onCommentCancelText,
   onCommentSelectSectionClear,
   SidebarOpen,
   onCommentViewMoreFalse,

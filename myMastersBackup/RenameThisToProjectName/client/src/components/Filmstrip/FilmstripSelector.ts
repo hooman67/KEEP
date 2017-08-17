@@ -496,7 +496,7 @@ const filmstripCommentSelector = createSelector(
       for (const singleColor in commentData) {
         const offset: number = baseHeight * colorCounter;
         const color: string = singleColor;
-        const data: { start: number, end: number, Text: string, _id: string, Parent: string, TimeStamp: string }[] = commentData[singleColor];
+        const data: { start: number, end: number, Text: string, _id: string, Parent: string, TimeStamp: string, showTimeRange: boolean, Replies: Array<any>}[] = commentData[singleColor];
         colorCounter += 1;
 
         for (const comment in data) {
@@ -529,6 +529,8 @@ const filmstripCommentSelector = createSelector(
                 Text: data[comment].Text,
                 Parent: data[comment].Parent,
                 TimeStamp: data[comment].TimeStamp,
+                showTimeRange: data[comment].showTimeRange,
+                Replies: data[comment].Replies,
               },
             });
             commentCounter += 1;
@@ -557,7 +559,7 @@ const filmstripActiveHiglightSelector = createSelector(
   highlightingMode,
   commentingMode,
   (filmstripDimensions, activeHighlightColor, highlightingMode, commentingMode) => {
-    if (!filmstripDimensions || !activeHighlightColor || !highlightingMode || commentingMode) {
+    if (!filmstripDimensions || !activeHighlightColor || !highlightingMode) {
       return null;
     }
     return activeHighlightColor
@@ -622,4 +624,3 @@ export const filmstripAggregateSelector = createSelector(
     return finalResult;
   },
 );
-

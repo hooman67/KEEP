@@ -19,7 +19,7 @@ class ColorPickerO extends Component<any, any> {
 
     return (
 
-      <div className={styles.container} style={{ right: '10px', top: this.props.cursorPosition.y + 35, transition: 'top 1s left 1s'}}>
+      <div className={styles.container} style={{ right: '10px', top: this.props.cursorPosition.y - 15, transition: 'top 1s left 1s'}}>
 
         <IconButton className={styles.icon}
           iconProps={{ iconName: 'Chat' }}
@@ -33,7 +33,7 @@ class ColorPickerO extends Component<any, any> {
 
 function mapStateToProps (state) {
   return {
-    selectSection: state.activeVideo.highlight ? state.activeVideo.highlight.selectSection : null,
+    selectSection: state.activeVideo.comment ? state.activeVideo.comment.selectSection : null,
   };
 }
 

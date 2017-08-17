@@ -11,3 +11,5 @@ export const showCommentIntervalWord = ActionCreator<IAction>(actions.SHOW_COMME
 export const hideCommentIntervalWord = ActionCreator<IAction>(actions.HIDE_COMMENT_INTERVAL_WORD);
 
 export const transcriptUpdate = ActionCreator<IAction>(actions.TRANSCRIPT_UPDATE);
+
+export const transcriptWidth = ActionCreator<IAction>(actions.TRANSCRIPT_WIDTH, 'width');

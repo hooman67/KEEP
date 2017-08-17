@@ -24,7 +24,7 @@ export default class Thumbnail extends PureComponent<IThumbnail, null> {
           const tnCommentData: ICommentData[] = this.props.commentData;
           
           tnCommentData.map((data, ) => {
-            data.showTimeRange = false;
+            data.onClickData.showTimeRange = false;
           });
 
         }}

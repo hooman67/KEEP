@@ -28,44 +28,51 @@ export default class Word extends Component<IWordProps, any> {
     if (selectSection.status === 'start') {
       if(this.props.highlightingMode){
         this.props.action.onHighlightSelectSectionInProcess(this.props.word.end);
-      } if(1/*this.props.commentingMode*/){
-        this.props.action.onCommentSelectSectionInProcess(this.props.word.end);
-      }
+      } 
+      
+      this.props.action.onCommentSelectSectionInProcess(this.props.word.end);
     }
   }
 
   onMousedownHandler () {
     if(this.props.highlightingMode){
       this.props.action.onHighlightSelectSectionStart(this.props.word.start);
-    } if(1/*this.props.commentingMode*/){
-      /*hs This stores the start timestamp of the select sections in
-      selectSection.selectSectionStartTime. Look at CommentReducer.ts in srvs
-      */
-      this.props.action.onCommentSelectSectionStart(this.props.word.start);
-    }
+    } 
 
+    /*hs This stores the start timestamp of the select sections in
+    selectSection.selectSectionStartTime. Look at CommentReducer.ts in srvs
+    */
+    this.props.action.onCommentSelectSectionStart(this.props.word.start);
   }
 
   onMouseupHandler (forceComment) {
     const selectSection = this.props.selectSection;
 
-    if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
-      this.props.displayButton(selectSection.selectSectionStartTime, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
-    }else{
+    if(selectSection.selectSectionStartTime == null){
       this.props.displayButton(this.props.word.start, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
-    }
-
-    if(this.props.highlightingMode){
-      if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
-        this.props.action.onHighlightSelectSectionEnd(selectSection.selectSectionStartTime, this.props.word.end, forceComment);
-      } else {
-        this.props.action.onHighlightSelectSectionClear();
+      if(this.props.commentingMode || forceComment) {
+         this.props.action.onCommentSelectSectionEnd("", this.props.word.start, this.props.word.end, forceComment); 
       }
-    } if(this.props.commentingMode || forceComment) {
+    }else{
       if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
-        this.props.action.onCommentSelectSectionEnd("", selectSection.selectSectionStartTime, this.props.word.end, forceComment);
-      } else {
-        this.props.action.onCommentSelectSectionClear();
+        this.props.displayButton(selectSection.selectSectionStartTime, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
+      }else{
+        this.props.displayButton(this.props.word.start, this.props.word.end, this.props.word.text, this.onMouseupHandler, false);
+      }
+
+      if(this.props.highlightingMode){
+        if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
+          this.props.action.onHighlightSelectSectionEnd(selectSection.selectSectionStartTime, this.props.word.end, forceComment);
+        } else {
+          this.props.action.onHighlightSelectSectionClear();
+        }
+      } 
+      if(this.props.commentingMode || forceComment) {
+        if (Math.abs(selectSection.selectSectionStartTime - this.props.word.end) > 0.5) {
+          this.props.action.onCommentSelectSectionEnd("", selectSection.selectSectionStartTime, this.props.word.end, forceComment);
+        } else {
+          this.props.action.onCommentSelectSectionClear();
+        }
       }
     }
 
@@ -123,6 +130,7 @@ export default class Word extends Component<IWordProps, any> {
       onCommentSendText: this.props.action.onCommentSendText,
       onCommentEditText: this.props.action.onCommentEditText,
       onCommentDeleteText: this.props.action.onCommentDeleteText,
+      onCommentCancelText: this.props.action.onCommentCancelText,
       onCommentReply: this.props.action.onCommentReply,
       onCommentSelectSectionEnd: this.props.action.onCommentSelectSectionEnd,
       onMouseupHandler: this.onMouseupHandler,

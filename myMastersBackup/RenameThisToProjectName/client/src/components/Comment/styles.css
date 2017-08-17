@@ -43,3 +43,13 @@
   margin-bottom:20px;
 }
 
+.icon {
+  flex: 1;
+  background: white;
+  margin: 1px;
+  border: 1px #ccc solid; 
+  height: 37px;
+}
+
+
+

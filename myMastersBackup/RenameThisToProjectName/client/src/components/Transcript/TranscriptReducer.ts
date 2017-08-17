@@ -11,7 +11,9 @@ const INITIAL_STATE = {
 };
 
 export default function (state = INITIAL_STATE, action) {
+
   switch (action.type) {
+
     case actions.TRANSCRIPT_INIT:
       return {
         ...state,
@@ -34,64 +36,71 @@ export default function (state = INITIAL_STATE, action) {
         transcriptObj: newTranscript,
       };
 
-      case actions.SHOW_COMMENT_INTERVAL_WORD:
-        const newTranscriptObj = state.transcriptObj;
-        let i;
+    case actions.SHOW_COMMENT_INTERVAL_WORD:
+      const newTranscriptObj = [...state.transcriptObj];
+      let i;
+      console.log(newTranscriptObj);
 
-        const startTime = getClosestTimestamp(newTranscriptObj, action.start)[0];;
-        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
-        const endTime =  getClosestTimestamp(newTranscriptObj, action.end)[1];
-;
-        /* get transcriptObj id for startTime*/
-        const startId = newTranscriptObj.filter(obj => obj.start === startTime)[0].id;
-        /* get transcriptObj id for endTime*/
-        const endId = newTranscriptObj.filter(obj => obj.end === endTime)[0].id;
+      const startTime = getClosestTimestamp(newTranscriptObj, action.start)[0];;
+      /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+      const endTime =  getClosestTimestamp(newTranscriptObj, action.end)[1];
 
-        console.log('Entered show comment interval word');
+      /* get transcriptObj id for startTime*/
+      const startId = newTranscriptObj.filter(obj => obj.start === startTime)[0].id;
+      /* get transcriptObj id for endTime*/
+      const endId = newTranscriptObj.filter(obj => obj.end === endTime)[0].id;
 
-        for (i = startId; i <= endId; i += 1) {
-          /* if activeColor is not present in the word.colors array then we add a color */
-          newTranscriptObj[i].showInterval = true;
+      console.log('Entered show comment interval word');
 
+      for (i = startId; i <= endId; i += 1) {
+        /* if activeColor is not present in the word.colors array then we add a color */
+        newTranscriptObj[i].showInterval = true;
+
+      }
+
+
+      return{
+        ...state,
+      } ;
+
+    case actions.HIDE_COMMENT_INTERVAL_WORD:
+
+      if (state.transcriptObj){
+        const newTranscriptObj2 = [...state.transcriptObj];
+
+        if (newTranscriptObj2){
+
+
+          let j;
+
+
+          for (j = 0; j <= newTranscriptObj2.length; j += 1) {
+            if (newTranscriptObj2[j]){
+            /* if activeColor is not present in the word.colors array then we add a color */
+            newTranscriptObj2[j].showInterval = false;
+            }
           }
 
 
-                  return{
-                    ...state,
-                    transcriptObj: newTranscriptObj
-                  } ;
+        return{
+          ...state,
+          transcriptObj: newTranscriptObj2
+        } }
+      };
 
-          case actions.HIDE_COMMENT_INTERVAL_WORD:
+    case actions.TRANSCRIPT_UPDATE:
 
-          if (state.transcriptObj){
-            const newTranscriptObj2 = state.transcriptObj;
-            if (newTranscriptObj2){
+      return {
+        ...state,
+        transcriptUpdate: !state.transcriptUpdate,
+      };
 
+      case actions.TRANSCRIPT_WIDTH:
 
-            let j;
-
-
-            for (j = 0; j <= newTranscriptObj2.length; j += 1) {
-              if (newTranscriptObj2[j]){
-              /* if activeColor is not present in the word.colors array then we add a color */
-              newTranscriptObj2[j].showInterval = false;
-            }
-
-              }
-
-
-                      return{
-                        ...state,
-                        transcriptObj: newTranscriptObj2
-                      } }};
-
-          case actions.TRANSCRIPT_UPDATE:
-
-            return {
-              ...state,
-              transcriptUpdate: !state.transcriptUpdate,
-            };
-
+          return {
+            ...state,
+            transcriptWidth: action.width,
+          };
 
     default:
       return state;

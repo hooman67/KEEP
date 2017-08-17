@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
+import {
+  getClosestTimestamp,
+} from '../Transcript/TranscriptHelpers';
 
 class HighlightedWords extends Component<any, any>  {
 
@@ -12,9 +15,14 @@ render(){
   const highlightTextStart = this.props.hStart;
   const highlightTextEnd = this.props.hEnd;
 
-  const startId = newTranscriptObj.filter(obj => obj.start === highlightTextStart)[0].id;
+  const startTime = getClosestTimestamp(newTranscriptObj, highlightTextStart)[0];;
+  /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+  const endTime =  getClosestTimestamp(newTranscriptObj, highlightTextEnd)[1];
+
+
+  const startId = newTranscriptObj.filter(obj => obj.start === startTime)[0].id;
   // /* get transcriptObj id for endTime*/
-  const endId = newTranscriptObj.filter((obj) => obj.end === highlightTextEnd)[0].id;
+  const endId = newTranscriptObj.filter((obj) => obj.end === endTime)[0].id;
 
   const firstWord = newTranscriptObj[startId].text;
 
@@ -41,4 +49,4 @@ function mapStateToProps (state) {
   };
 
 }
-export default connect(mapStateToProps)(HighlightedWords) 
+export default connect(mapStateToProps)(HighlightedWords)

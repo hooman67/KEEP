@@ -14,6 +14,7 @@ export {
   showCommentIntervalWord,
   hideCommentIntervalWord,
   transcriptUpdate,
+  transcriptWidth,
 } from './Actions';
 
 export {

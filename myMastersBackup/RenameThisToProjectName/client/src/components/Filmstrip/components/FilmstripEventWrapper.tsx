@@ -39,7 +39,19 @@ export default class FilmstripEventWrap extends Component<any, any> {
     // if filmstrip highlight select section action starts
     // it will process the cursor coordinates
 
-    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
+      if (inputData.indicatorData.selectSectionDataHighlight.status === 'start') {
+        actions.onHighlightSelectSectionInProcess(
+          pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+        );
+      }
+
+      if (inputData.indicatorData.selectSectionDataComment.status === 'start'){
+        actions.onCommentSelectSectionInProcess(
+          pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+        );
+      }
+
+  /*  if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
       if (inputData.indicatorData.selectSectionDataHighlight.status === 'start') {
         actions.onHighlightSelectSectionInProcess(
           pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
@@ -50,8 +62,7 @@ export default class FilmstripEventWrap extends Component<any, any> {
         actions.onCommentSelectSectionInProcess(
           pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
         );
-      }
-    }
+      }*/
 
   }
 
@@ -64,7 +75,15 @@ export default class FilmstripEventWrap extends Component<any, any> {
     const actions: TFilmstripActions = this.props.actions;
     const cursorPosition: ICursorPosition = this.props.cursorPosition;
 
-    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
+    actions.onHighlightSelectSectionStart(
+      pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+    );
+
+    actions.onCommentSelectSectionStart(
+      pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
+    );
+
+   /* if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
     // call onFilmstripSelectSectionStart action to start the filmstrip highlight selection
       actions.onHighlightSelectSectionStart(
         pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
@@ -73,7 +92,7 @@ export default class FilmstripEventWrap extends Component<any, any> {
       actions.onCommentSelectSectionStart(
         pixelToTimestamp(cursorPosition.x, inputData.boundaryData, inputData.dimensionsData),
       );
-    }
+    }*/
   }
 
   /**
@@ -89,7 +108,23 @@ export default class FilmstripEventWrap extends Component<any, any> {
       cursorPosition.x, inputData.boundaryData, inputData.dimensionsData,
     );
 
-    if(inputData.activeCommentData == null && inputData.activeHighlightData != null){
+    if (Math.abs(inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime - onClickTimeStamp) < 0.5) {
+      // if the difference is less then 0.5 second, then it will be seen as a click event
+      actions.onHighlightSelectSectionClear();
+      actions.onCommentSelectSectionClear();
+      actions.onVideoPlayerSeek(onClickTimeStamp);
+    } else {
+      // Otherwise it is a drag event
+
+      actions.onCommentSelectSectionEndFS("",inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp, cursorPosition.x, cursorPosition.y);
+
+      actions.onHighlightSelectSectionEnd(inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime, onClickTimeStamp,);
+      actions.onHighlightSelectSectionClear();
+      
+     // actions.onCommentSelectSectionClear();
+    }
+
+   /* if(inputData.activeHighlightData){
     // check the time difference between start and end time
       if (Math.abs(inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime - onClickTimeStamp) < 0.5) {
         // if the difference is less then 0.5 second, then it will be seen as a click event
@@ -100,20 +135,17 @@ export default class FilmstripEventWrap extends Component<any, any> {
         actions.onHighlightSelectSectionEnd(
           inputData.indicatorData.selectSectionDataHighlight.selectSectionStartTime, onClickTimeStamp,
         );
+        actions.onCommentSelectSectionClear();
       }
-    }else if(inputData.activeCommentData != null && inputData.activeHighlightData == null){
+    }else if(inputData.activeCommentData){
       if (Math.abs(inputData.indicatorData.selectSectionDataComment.selectSectionStartTime - onClickTimeStamp) < 0.5) {
         // if the difference is less then 0.5 second, then it will be seen as a click event
         actions.onCommentSelectSectionClear();
         actions.onVideoPlayerSeek(onClickTimeStamp);
       } else {
-        // Otherwise it is a drag event
-        // actions.onCommentSendText(uuid.v4(),
-        //   inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp, "Test"
-        // );
-        actions.onCommentSelectSectionEndFS("",inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp);
+        actions.onCommentSelectSectionEndFS("",inputData.indicatorData.selectSectionDataComment.selectSectionStartTime, onClickTimeStamp, cursorPosition.x, cursorPosition.y);
       }
-    }
+    }*/
   }
 
   /**

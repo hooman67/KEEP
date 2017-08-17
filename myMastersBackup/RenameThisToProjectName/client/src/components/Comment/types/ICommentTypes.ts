@@ -7,4 +7,7 @@ export interface ICommentProps {
   hideCommentIntervalWord: any;
   SidebarOpen: any;
   transcriptUpdate: any;
+  transcriptObj: Array<any>;
+  onCommentHover: any;
+  onCommentNotHover: any;
 }

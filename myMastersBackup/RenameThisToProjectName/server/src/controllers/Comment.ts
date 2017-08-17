@@ -70,6 +70,7 @@ export const postComments = async (req, res) => {
     try {
       for (const commentData of req.body.Comments) {
         if (commentData._id) {
+          commentData.PreviousText = commentData.Text;
           console.log("SS pushing to server");
           console.log("hs query.comments:\n", userLessonQueryResult.Comments)
           if(commentData.Parent){

@@ -132,20 +132,26 @@ export function findSearchPhrase (searchArr, transcriptObj) {
 export function getClosestTimestamp (transcriptObj, time) {
   let lo = -1;
   let hi = transcriptObj.length;
-  while (hi - lo > 1) {
-    const mid = Math.round((lo + hi) / 2);
-    if (Number(transcriptObj[mid].start) <= time) {
-      lo = mid;
-    } else {
-      hi = mid;
+
+  if(hi >0){
+    while (hi - lo > 1) {
+      const mid = Math.round((lo + hi) / 2);
+      if (Number(transcriptObj[mid].start) <= time) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
     }
-  }
-  lo = lo === -1 ? 0 : lo;
-  if (transcriptObj[lo].start === time) {
-    hi = lo;
+    lo = lo === -1 ? 0 : lo;
+    if (transcriptObj[lo].start === time) {
+      hi = lo;
+    }
+
+    return [transcriptObj[lo].start, transcriptObj[hi].start];
+  }else{
+    return time;
   }
 
-  return [transcriptObj[lo].start, transcriptObj[hi].start];
 }
 
 /** Handler for getting css color for a highlight color
@@ -235,156 +241,170 @@ export function handleSingleComment (transcriptObj, colorTimeStamps, activeColor
  * @param  {Object[]} highlightData - array of color objects
  */
 export function addHighLightFlags (transcriptObj, highlightData, commentData) {
-  let newTranscriptObj = {};
-  /* Add color array to every word */
-  newTranscriptObj = transcriptObj.map((obj) => {
-    obj.colors = [];
-    obj.comments = [];
-    obj.isCommentEnd = false;
-    obj.showInterval = false;
-    return obj;
-  });
-  let i;
-  const colorTimeStamps = { startTime: 0, endTime: 0 };
-  /* For every highlightData we use  handleSingleColorHighlight to add flags to words */
-  if (highlightData && highlightData.red) {
-    for (i = 0; i < highlightData.red.length; i += 1) {
-      colorTimeStamps.startTime = highlightData.red[i].start;
-      colorTimeStamps.endTime = highlightData.red[i].end;
-      newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'red', true);
-    }
-  }
-  if (highlightData && highlightData.yellow) {
-    for (i = 0; i < highlightData.yellow.length; i += 1) {
-      colorTimeStamps.startTime = highlightData.yellow[i].start;
-      colorTimeStamps.endTime = highlightData.yellow[i].end;
-      newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'yellow', true);
-    }
-  }
-  if (highlightData && highlightData.blue) {
-    for (i = 0; i < highlightData.blue.length; i += 1) {
-      colorTimeStamps.startTime = highlightData.blue[i].start;
-      colorTimeStamps.endTime = highlightData.blue[i].end;
-      newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'blue', true);
-    }
-  }
-  if (highlightData && highlightData.green) {
-    for (i = 0; i < highlightData.green.length; i += 1) {
-      colorTimeStamps.startTime = highlightData.green[i].start;
-      colorTimeStamps.endTime = highlightData.green[i].end;
-      newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'green', true);
-    }
-  }
-  if (highlightData && highlightData.purple) {
-    for (i = 0; i < highlightData.purple.length; i += 1) {
-      colorTimeStamps.startTime = highlightData.purple[i].start;
-      colorTimeStamps.endTime = highlightData.purple[i].end;
-      newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'purple', true);
-    }
-  }
-
-
-  //HS same as above but to add the stuff in commandData as well
-  //TODO remove above when no longer showing comments as highlights
-    if (commentData && commentData.red) {
-      for (i = 0; i < commentData.red.length; i += 1) {
-        colorTimeStamps.startTime = commentData.red[i].start;
-
-        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
-        const endTime = getClosestTimestamp(transcriptObj, commentData.red[i].end)[1];
-
-        /* get transcriptObj id for endTime*/
-        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-
-
-        newTranscriptObj[endId].comments.push({
-          _id:     commentData.red[i]._id,
-          TimeStamp: commentData.red[i].TimeStamp,
-          start:   commentData.red[i].start,
-          end:     commentData.red[i].end,
-          Color: 'red',
-          Text:    commentData.red[i].Text,
-          Parent:  commentData.red[i].Parent,
-          Replies: commentData.red[i].Replies,
-        });
-
+  if(transcriptObj.length > 0){
+    let newTranscriptObj = {};
+      /* Add color array to every word */
+      newTranscriptObj = transcriptObj.map((obj) => {
+        obj.colors = [];
+        obj.comments = [];
+        obj.isCommentEnd = false;
+        obj.showInterval = false;
+        return obj;
+      });
+      let i;
+      const colorTimeStamps = { startTime: 0, endTime: 0 };
+      /* For every highlightData we use  handleSingleColorHighlight to add flags to words */
+      if (highlightData && highlightData.red) {
+        for (i = 0; i < highlightData.red.length; i += 1) {
+          colorTimeStamps.startTime = highlightData.red[i].start;
+          colorTimeStamps.endTime = highlightData.red[i].end;
+          newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'red', true);
+        }
       }
-    }
-
-
-    if (commentData && commentData.yellow) {
-      for (i = 0; i < commentData.yellow.length; i += 1) {
-        colorTimeStamps.startTime = commentData.yellow[i].start;
-
-        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
-        const endTime = getClosestTimestamp(transcriptObj, commentData.yellow[i].end)[1];
-
-        /* get transcriptObj id for endTime*/
-        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-
-
-        newTranscriptObj[endId].comments.push({
-          _id:     commentData.yellow[i]._id,
-          start:   commentData.yellow[i].start,
-          end:     commentData.yellow[i].end,
-          TimeStamp: commentData.yellow[i].TimeStamp,
-          Color: 'yellow',
-          Text:    commentData.yellow[i].Text,
-          Parent:  commentData.yellow[i].Parent,
-          Replies: commentData.yellow[i].Replies,
-        });
+      if (highlightData && highlightData.yellow) {
+        for (i = 0; i < highlightData.yellow.length; i += 1) {
+          colorTimeStamps.startTime = highlightData.yellow[i].start;
+          colorTimeStamps.endTime = highlightData.yellow[i].end;
+          newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'yellow', true);
+        }
       }
-    }
-
-
-    if (commentData && commentData.blue) {
-      for (i = 0; i < commentData.blue.length; i += 1) {
-        colorTimeStamps.startTime = commentData.blue[i].start;
-
-        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
-        const endTime = getClosestTimestamp(transcriptObj, commentData.blue[i].end)[1];
-
-        /* get transcriptObj id for endTime*/
-        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-
-
-        newTranscriptObj[endId].comments.push({
-          _id:     commentData.blue[i]._id,
-          start:   commentData.blue[i].start,
-          end:     commentData.blue[i].end,
-          TimeStamp: commentData.blue[i].TimeStamp,
-          Color: 'blue',
-          Text:    commentData.blue[i].Text,
-          Parent:  commentData.blue[i].Parent,
-          Replies: commentData.blue[i].Replies,
-        });
+      if (highlightData && highlightData.blue) {
+        for (i = 0; i < highlightData.blue.length; i += 1) {
+          colorTimeStamps.startTime = highlightData.blue[i].start;
+          colorTimeStamps.endTime = highlightData.blue[i].end;
+          newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'blue', true);
+        }
       }
-    }
-    if (commentData && commentData.green) {
-      for (i = 0; i < commentData.green.length; i += 1) {
-        colorTimeStamps.startTime = commentData.green[i].start;
-
-        /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
-        const endTime = getClosestTimestamp(transcriptObj, commentData.green[i].end)[1];
-
-        /* get transcriptObj id for endTime*/
-        const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
-
-
-        newTranscriptObj[endId].comments.push({
-          _id:     commentData.green[i]._id,
-          start:   commentData.green[i].start,
-          end:     commentData.green[i].end,
-          TimeStamp: commentData.green[i].TimeStamp,
-          Color: 'green',
-          Text:    commentData.green[i].Text,
-          Parent:  commentData.green[i].Parent,
-          Replies: commentData.green[i].Replies,
-        });
+      if (highlightData && highlightData.green) {
+        for (i = 0; i < highlightData.green.length; i += 1) {
+          colorTimeStamps.startTime = highlightData.green[i].start;
+          colorTimeStamps.endTime = highlightData.green[i].end;
+          newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'green', true);
+        }
       }
-    }
+      if (highlightData && highlightData.purple) {
+        for (i = 0; i < highlightData.purple.length; i += 1) {
+          colorTimeStamps.startTime = highlightData.purple[i].start;
+          colorTimeStamps.endTime = highlightData.purple[i].end;
+          newTranscriptObj = handleSingleColorHighlight(transcriptObj, colorTimeStamps, 'purple', true);
+        }
+      }
 
-  return newTranscriptObj;
+
+      //HS same as above but to add the stuff in commandData as well
+      //TODO remove above when no longer showing comments as highlights
+        if (commentData && commentData.red) {
+          for (i = 0; i < commentData.red.length; i += 1) {
+            colorTimeStamps.startTime = commentData.red[i].start;
+
+            /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+            const endTime = getClosestTimestamp(transcriptObj, commentData.red[i].end)[1];
+
+            /* get transcriptObj id for endTime*/
+            const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+
+
+            newTranscriptObj[endId].comments.push({
+              _id:     commentData.red[i]._id,
+              TimeStamp: commentData.red[i].TimeStamp,
+              start:   commentData.red[i].start,
+              end:     commentData.red[i].end,
+              Color: 'red',
+              Text:    commentData.red[i].Text,
+              PreviousText: commentData.red[i].PreviousText,
+              Parent:  commentData.red[i].Parent,
+              Replies: commentData.red[i].Replies,
+            });
+
+          }
+        }
+
+
+        if (commentData && commentData.yellow) {
+          for (i = 0; i < commentData.yellow.length; i += 1) {
+            colorTimeStamps.startTime = commentData.yellow[i].start;
+
+            /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+            const endTime = getClosestTimestamp(transcriptObj, commentData.yellow[i].end)[1];
+
+            /* get transcriptObj id for endTime*/
+            const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+
+
+            newTranscriptObj[endId].comments.push({
+              _id:     commentData.yellow[i]._id,
+              start:   commentData.yellow[i].start,
+              end:     commentData.yellow[i].end,
+              TimeStamp: commentData.yellow[i].TimeStamp,
+              Color: 'yellow',
+              PreviousText: commentData.yellow[i].PreviousText,
+              Text:    commentData.yellow[i].Text,
+              Parent:  commentData.yellow[i].Parent,
+              Replies: commentData.yellow[i].Replies,
+            });
+          }
+        }
+
+
+        if (commentData && commentData.blue) {
+          for (i = 0; i < commentData.blue.length; i += 1) {
+            colorTimeStamps.startTime = commentData.blue[i].start;
+
+            /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+            const endTime = getClosestTimestamp(transcriptObj, commentData.blue[i].end)[1];
+
+            /* get transcriptObj id for endTime*/
+            const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+
+
+            newTranscriptObj[endId].comments.push({
+              _id:     commentData.blue[i]._id,
+              start:   commentData.blue[i].start,
+              end:     commentData.blue[i].end,
+              TimeStamp: commentData.blue[i].TimeStamp,
+              Color: 'blue',
+              PreviousText: commentData.blue[i].PreviousText,
+              Text:    commentData.blue[i].Text,
+              Parent:  commentData.blue[i].Parent,
+              Replies: commentData.blue[i].Replies,
+            });
+          }
+        }
+        if (commentData && commentData.green) {
+          for (i = 0; i < commentData.green.length; i += 1) {
+            colorTimeStamps.startTime = commentData.green[i].start;
+            let endTime: number;
+            /* get transcriptObj timestamp for endtime of  colorTimeStamps*/
+            if(transcriptObj.length > 0){
+              endTime = getClosestTimestamp(transcriptObj, commentData.green[i].end)[1];
+            }else{
+              endTime = commentData.green[i].end;
+            }
+          
+
+            /* get transcriptObj id for endTime*/
+            const endId = transcriptObj.filter(obj => obj.end === endTime)[0].id;
+
+
+            newTranscriptObj[endId].comments.push({
+              _id:     commentData.green[i]._id,
+              start:   commentData.green[i].start,
+              end:     commentData.green[i].end,
+              TimeStamp: commentData.green[i].TimeStamp,
+              Color: 'green',
+              PreviousText: commentData.green[i].PreviousText,
+              Text:    commentData.green[i].Text,
+              Parent:  commentData.green[i].Parent,
+              Replies: commentData.green[i].Replies,
+            });
+          }
+        }
+
+      return newTranscriptObj;
+  }else{
+    return transcriptObj;
+  }
+ 
 }
 /* Creates a div with styles and fonts to check width */
 function measureText (pText) {

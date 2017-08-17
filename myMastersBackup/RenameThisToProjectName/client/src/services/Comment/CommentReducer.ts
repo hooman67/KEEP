@@ -6,6 +6,7 @@ import {
   updateCommentStateWithReplyAndText,
   updateCommentStateWithReply,
   updateCommentStateWithCommentRemove,
+  updateCommentStateWithHover
 } from './CommentHelper';
 
 const INITIAL_STATE = {
@@ -18,20 +19,30 @@ const INITIAL_STATE = {
   removeComment: false,
   activeCommentColor: 'green',
   commentingMode: false,
+
   // communicate with database
   commentUpdate: {
     remove: null,
     create: null,
     edit:   null,
   },
+
   selectSection: {
     selectSectionStartTime: null,
     selectSectionEndTime: null,
     status: 'free',
   },
+
   commentViewMore: false,
   commentViewMoreId: null,
   commentExpandAll: false,
+
+  fdDelayedCommentAction: null,
+  fsComCursorPosition: {
+    x: 5,
+    y: 5,
+  },
+
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -53,10 +64,44 @@ export default (state = INITIAL_STATE, action) => {
       };
 
     case actions.COMMENT_SELECT_COLOR:
-      return {
-        ...state,
-        activeCommentColor: action.color,
-      };
+      if(state.fdDelayedCommentAction){
+        const mergedCommentFSDelayed = [...state.commentData[action.color], {
+          start: state.fdDelayedCommentAction.start,
+          end: state.fdDelayedCommentAction.end,
+          Color: action.color,
+          PreviousText: state.fdDelayedCommentAction.PreviousText,
+          Text: state.fdDelayedCommentAction.Text,
+          TimeStamp: state.fdDelayedCommentAction.TimeStamp,
+          Parent: state.fdDelayedCommentAction.Parent,
+          showTimeRange: false,
+        }];
+
+        const [commentsWithUUIDFsDelayed, commentUpdateFsDelayed] = commentGenerateDiff(mergedCommentFSDelayed, state.commentData[action.color], action.color);
+
+        const updateColorPickerDataDelayed = commentUpdateFsDelayed.create[0];
+
+        return {
+          ...state,
+          activeCommentColor: action.color,
+          commentData: {
+            ...state.commentData,
+            [action.color]: commentsWithUUIDFsDelayed,
+          },
+          fdDelayedCommentAction: null,
+          colorPickerData: updateColorPickerDataDelayed,
+          colorPickerDisplay: true,
+          commentUpdate:{
+            remove: [],
+            create: [],
+            edit:   [],
+          },
+        };
+      }else{
+        return{
+          ...state,
+          activeCommentColor: action.color,
+        };
+      }
 
     case actions.COMMENT_MODE_CHANGE:
       return {
@@ -88,7 +133,96 @@ export default (state = INITIAL_STATE, action) => {
           [state.activeCommentColor]: deleteTextUpdatedComments,
         },
         commentUpdate: commentUpdateDeleteText,
+        colorPickerData: null,
+        colorPickerDisplay: false
       };
+
+
+    case actions.COMMENT_CANCEL_TEXT:
+
+      if(action.Text){
+        if(action.Parent){
+          console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
+
+          const [cancelTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
+            uuid: action.uuid,
+            start: action.startTime,
+            end: action.endTime,
+            TimeStamp: action.TimeStamp,
+            Text: action.Text,
+            Parent: action.Parent,
+            showTimeRange: false,
+          });
+
+          return {
+            ...state,
+            commentData: {
+              ...state.commentData,
+              [state.activeCommentColor]: cancelTextUpdatedComments,
+            },
+            commentUpdate: {
+              remove: [],
+              create: [],
+              edit:   [],
+            },
+            colorPickerData: null,
+            colorPickerDisplay: false,
+          };
+
+        }else{
+          const cancelTextUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
+            uuid: action.uuid,
+            start: action.startTime,
+            end: action.endTime,
+            TimeStamp: action.TimeStamp,
+            Text: action.Text,
+            Parent: action.Parent,
+            showTimeRange: false,
+          });
+
+          return {
+            ...state,
+            commentData: {
+              ...state.commentData,
+              [state.activeCommentColor]: cancelTextUpdatedComments,
+            },
+            commentUpdate: {
+              remove: [],
+              create: [],
+              edit:   [],
+            },
+            colorPickerData: null,
+            colorPickerDisplay: false,
+          };
+        }
+      }else{
+        const commentToBeCanceled = {
+          uuid: action.uuid,
+          start: action.startTime,
+          end: action.endTime,
+          Text: action.Text,
+          Parent: action.Parent,
+        };
+
+        const cancelTextUpdatedComments = updateCommentStateWithCommentRemove([...state.commentData[state.activeCommentColor]], commentToBeCanceled);
+
+        return {
+          ...state,
+          commentData: {
+            ...state.commentData,
+            [state.activeCommentColor]: cancelTextUpdatedComments,
+          },
+          commentUpdate: {
+            remove: [],
+            create: [],
+            edit:   [],
+          },
+          colorPickerData: null,
+          colorPickerDisplay: false
+        };
+      }
+
+     
 
 
     case actions.COMMENT_EDIT_TEXT:
@@ -154,51 +288,6 @@ export default (state = INITIAL_STATE, action) => {
 
         if(action.Parent){
           console.log('hs updating parent: ', action.Parent, ' for child: ', action.uuid);
-
-         /* const [sendTextUpdatedComments, parentComment] = updateCommentStateWithReplyAndText([...state.commentData[state.activeCommentColor]], {
-            uuid: action.uuid,
-            start: action.startTime,
-            end: action.endTime,
-            Text: action.Text,
-            Parent: action.Parent,
-          });
-
-          if(state.updateComment){
-            state.updateComment = false;
-
-            commentUpdateSendText.edit.push({
-              _id: action.uuid,
-              TimeRange: {
-                start: action.startTime,
-                end: action.endTime,
-              },
-              Color: state.activeCommentColor,
-              Text: action.Text,
-              Parent: action.Parent,
-            });
-          }else {
-            //HS add the comment to comments
-            commentUpdateSendText.create.push({
-              _id: action.uuid,
-              TimeRange: {
-                start: action.startTime,
-                end: action.endTime,
-              },
-              Color: state.activeCommentColor,
-              Text: action.Text,
-              Parent: action.Parent,
-            });
-          }
-
-          return {
-            ...state,
-            commentData: {
-              ...state.commentData,
-              [state.activeCommentColor]: sendTextUpdatedComments,
-            },
-            commentUpdate: commentUpdateSendText,
-          };*/
-
         }else{
           const sendTextFilmStripUpdatedComments = updateCommentStateWithText([...state.commentData[state.activeCommentColor]], {
             uuid: action.uuid,
@@ -206,7 +295,9 @@ export default (state = INITIAL_STATE, action) => {
             end: action.endTime,
             TimeStamp: action.TimeStamp,
             Text: action.Text,
+            PreviousText: action.PreviousText,
             Parent: action.Parent,
+            showTimeRange: false,
           });
 
           if(state.updateComment){
@@ -221,7 +312,9 @@ export default (state = INITIAL_STATE, action) => {
               },
               Color: state.activeCommentColor,
               Text: action.Text,
+              PreviousText: action.PreviousText,
               Parent: action.Parent,
+              showTimeRange: false,
             });
 
           }else{
@@ -235,7 +328,9 @@ export default (state = INITIAL_STATE, action) => {
               },
               Color: state.activeCommentColor,
               Text: action.Text,
+              PreviousText: action.PreviousText,
               Parent: action.Parent,
+              showTimeRange: false,
             });
 
           }
@@ -249,6 +344,12 @@ export default (state = INITIAL_STATE, action) => {
             colorPickerData: null,
             colorPickerDisplay: false,
             commentUpdate: commentUpdateSendTextFilmStrip,
+            selectSection: {
+              ...state.selectSection,
+              selectSectionStartTime: null,
+              selectSectionEndTime: null,
+              status: 'free',
+            },
           };
         }
 
@@ -270,7 +371,9 @@ export default (state = INITIAL_STATE, action) => {
             end: action.endTime,
             TimeStamp: action.TimeStamp,
             Text: action.Text,
+            PreviousText: action.PreviousText,
             Parent: action.Parent,
+            showTimeRange: false,
           });
 
           if(state.updateComment){
@@ -284,8 +387,10 @@ export default (state = INITIAL_STATE, action) => {
                 end: action.endTime,
               },
               Color: state.activeCommentColor,
+              PreviousText: action.PreviousText,
               Text: action.Text,
               Parent: action.Parent,
+              showTimeRange: false,
             });
           }else {
             //HS add the comment to comments
@@ -297,8 +402,10 @@ export default (state = INITIAL_STATE, action) => {
                 end: action.endTime,
               },
               Color: state.activeCommentColor,
+              PreviousText: action.PreviousText,
               Text: action.Text,
               Parent: action.Parent,
+              showTimeRange: false,
             });
           }
 
@@ -309,6 +416,14 @@ export default (state = INITIAL_STATE, action) => {
               [state.activeCommentColor]: sendTextUpdatedComments,
             },
             commentUpdate: commentUpdateSendText,
+            colorPickerData: null,
+            colorPickerDisplay: false,
+            selectSection: {
+              ...state.selectSection,
+              selectSectionStartTime: null,
+              selectSectionEndTime: null,
+              status: 'free',
+            },
           };
 
         }else{
@@ -318,7 +433,9 @@ export default (state = INITIAL_STATE, action) => {
             end: action.endTime,
             TimeStamp: action.TimeStamp,
             Text: action.Text,
+            PreviousText: action.PreviousText,
             Parent: action.Parent,
+            showTimeRange: false,
           });
 
           if(state.updateComment){
@@ -332,8 +449,10 @@ export default (state = INITIAL_STATE, action) => {
                 end: action.endTime,
               },
               Color: state.activeCommentColor,
+              PreviousText: action.PreviousText,
               Text: action.Text,
               Parent: action.Parent,
+              showTimeRange: false,
             });
 
           }else{
@@ -346,8 +465,10 @@ export default (state = INITIAL_STATE, action) => {
                 end: action.endTime,
               },
               Color: state.activeCommentColor,
+              PreviousText: action.PreviousText,
               Text: action.Text,
               Parent: action.Parent,
+              showTimeRange: false,
             });
 
           }
@@ -359,6 +480,14 @@ export default (state = INITIAL_STATE, action) => {
               [state.activeCommentColor]: sendTextUpdatedComments,
             },
             commentUpdate: commentUpdateSendText,
+            colorPickerData: null,
+            colorPickerDisplay: false,
+            selectSection: {
+              ...state.selectSection,
+              selectSectionStartTime: null,
+              selectSectionEndTime: null,
+              status: 'free',
+            },
           };
         }
 
@@ -383,8 +512,10 @@ export default (state = INITIAL_STATE, action) => {
             end: action.endTime,
             TimeStamp: currentTime,
             Color: state.activeCommentColor,
+            PreviousText: action.PreviousText,
             Text: action.Text,
             Parent: action.Parent,
+            showTimeRange: false,
           });
 
           return {
@@ -406,8 +537,10 @@ export default (state = INITIAL_STATE, action) => {
             end: action.endTime,
             TimeStamp: currentTime,
             Color: state.activeCommentColor,
+            PreviousText: action.PreviousText,
             Text: action.Text,
             Parent: action.Parent,
+            showTimeRange: false,
           }];
 
           const [commentsWithUUID, commentUpdate] = commentGenerateDiff(mergedComment, state.commentData[state.activeCommentColor], state.activeCommentColor);
@@ -443,50 +576,58 @@ export default (state = INITIAL_STATE, action) => {
             status: 'end',
         }
 
+        const timeTempFS = ((new Date()).getTime()*1000);
+        const currentTimeFS = (new Date(timeTempFS)).toString();
+
         if(state.commentingMode){
-          const timeTempFS = ((new Date()).getTime()*1000);
-          const currentTimeFS = (new Date(timeTempFS)).toString();
+          const mergedCommentFS = [...state.commentData[state.activeCommentColor], {
+            start: action.startTime,
+            end: action.endTime,
+            Color: state.activeCommentColor,
+            PreviousText: action.PreviousText,
+            Text: action.Text,
+            TimeStamp: currentTimeFS,
+            Parent: action.Parent,
+            showTimeRange: false,
+          }];
 
-          if(action.Parent){
-            //do for reply
-          }else{
-            //no reply
-              const mergedCommentFS = [...state.commentData[state.activeCommentColor], {
-              start: action.startTime,
-              end: action.endTime,
-              Color: state.activeCommentColor,
-              Text: action.Text,
-              TimeStamp: currentTimeFS,
-              Parent: action.Parent,
-            }];
+        const [commentsWithUUIDFS, commentUpdateFS] = commentGenerateDiff(mergedCommentFS, state.commentData[state.activeCommentColor], state.activeCommentColor);
 
-              const [commentsWithUUIDFS, commentUpdateFS] = commentGenerateDiff(mergedCommentFS, state.commentData[state.activeCommentColor], state.activeCommentColor);
-
-              const updateColorPickerData = commentUpdateFS.create[0];
-              console.log("Update Color Picker Data", updateColorPickerData);
-              return {
-              ...state,
-              commentData: {
-                ...state.commentData,
-                [state.activeCommentColor]: commentsWithUUIDFS,
-              },
-              colorPickerData: updateColorPickerData,
-              colorPickerDisplay: true,
-              commentUpdate:{
-                remove: [],
-                create: [],
-                edit:   [],
-              },
-              selectSection: selectSectionComplete,
-              };
-
-            }
+        const updateColorPickerData = commentUpdateFS.create[0];
+        console.log("Update Color Picker Data", updateColorPickerData);
+          return {
+            ...state,
+            commentData: {
+              ...state.commentData,
+              [state.activeCommentColor]: commentsWithUUIDFS,
+            },
+            colorPickerData: updateColorPickerData,
+            colorPickerDisplay: true,
+            commentUpdate:{
+              remove: [],
+              create: [],
+              edit:   [],
+            },
+            selectSection: selectSectionComplete,
+          };
 
         }else{
           return{
             ...state,
             selectSection: selectSectionComplete,
-            colorPickerDisplay: true,
+            fdDelayedCommentAction: {
+              start: action.startTime,
+              end: action.endTime,
+              Color: '',
+              PreviousText: action.PreviousText,
+              Text: action.Text,
+              TimeStamp: currentTimeFS,
+              Parent: action.Parent,
+            },
+            fsComCursorPosition: {
+              x: action.XMouseLoc,
+              y: action.YMouseLoc,
+            },
           }
         }
 
@@ -557,9 +698,7 @@ export default (state = INITIAL_STATE, action) => {
         },
       };
 
-    case actions.COMMENT_HOVER:
-      console.log("COMMENT HOVER IN COMMENT REDUCER");
-      console.log(state.commentData);
+
 
     case actions.COMMENT_FILMSTRIP_EDIT_TOGGLE:
       state.updateComment = true;
@@ -574,6 +713,7 @@ export default (state = INITIAL_STATE, action) => {
           Text: action.Text,
           Parent: action.Parent,
           TimeStamp: action.TimeStamp,
+          showTimeRange: false,
         });
             return{
           ...state,
@@ -608,6 +748,7 @@ export default (state = INITIAL_STATE, action) => {
           end: action.endTime,
           Text: action.Text,
           Parent: action.Parent,
+          showTimeRange: false,
         });
 
         return{
@@ -660,13 +801,31 @@ export default (state = INITIAL_STATE, action) => {
           };
 
 
-    case actions.COMMENT_FILMSTRIP_CANCEL_EDIT_TOGGLE:
-          return{
-            ...state,
-            colorPickerData: null,
-            colorPickerDisplay: false
-          }
+    case actions.COMMENT_HOVER:
+      const hoverUpdatedComment = updateCommentStateWithHover([...state.commentData[action.color]], {
+          uuid: action.uuid,
+          showTimeRange: action.showTimeRange,
+        });
+      return{
+        ...state,
+        commentData:{
+        ...state.commentData,
+            [action.color]: hoverUpdatedComment,
+        }
+      }
 
+    case actions.COMMENT_NOT_HOVER:
+      const nonHoverUpdatedComment = updateCommentStateWithHover([...state.commentData[action.color]], {
+          uuid: action.uuid,
+          showTimeRange: action.showTimeRange,
+        });
+      return{
+        ...state,
+        commentData:{
+        ...state.commentData,
+            [action.color]: nonHoverUpdatedComment,
+        }
+      }
 
 
     default:

@@ -1,5 +1,16 @@
 import { ICursorPosition } from '../../../types/ISystemCommon';
 
+
+// TODO: CHANGE ANY TYPE
+export interface IThumbnailPlayer {
+  key: number;
+  cursorPosition: ICursorPosition;
+  start: number;
+  end: number;
+  data: ISingleThumbnailData[];
+}
+
+
 export interface IThumbnailData {
   duration: number;
   coordinates: ISingleThumbnailData[];
@@ -22,4 +33,9 @@ export interface IThumbnail {
   };
   data: ISingleThumbnailData;
   src: string;
+}
+
+export interface IThumbnailSorter{
+  start: number;
+  end: number;
 }

@@ -26,6 +26,7 @@ import {
 } from '../../components/VideoPlayer';
 import {
   Transcript,
+  transcriptWidth,
 } from '../../components/Transcript';
 import {
   Filmstrip,
@@ -34,6 +35,7 @@ import styles from './styles.css';
 
 import SideBar from '../../components/SideBar/SideBar';
 import SideBarOverlay from '../../components/SideBar/SideBarOverlay';
+import Measure from 'react-measure';
 
 
 class ActiveVideo extends Component<any, any> {
@@ -70,12 +72,14 @@ class ActiveVideo extends Component<any, any> {
                                         </div>
 
                                         <div className={styles.content}>
-                                            <SplitPane split="vertical" defaultSize="60%" className='primary' pane2Style={{ overflowY: 'auto' }}>
+                                            <SplitPane split="vertical" defaultSize="60%" className='primary' pane2Style = {{overflowY: 'auto'}} >
                                               <SplitPane split='horizontal' defaultSize='70%' className='primary' >
                                                 <VideoPlayer />
                                                 <Filmstrip />
                                               </SplitPane>
-                                              <SideBarOverlay />
+                                              <Measure onMeasure = {({width}) => {this.props.transcriptWidth(width)}}>
+                                                <SideBarOverlay style = {{overflowY: 'auto'}}/>
+                                              </Measure>
                                             </SplitPane>
                                           </div>
                                         </div>
@@ -94,6 +98,7 @@ const actions = {
   onCommentUpdate,
   onViewCountFetch,
   onViewCountUpdate,
+  transcriptWidth,
 };
 
 function mapStateToProps (state) {

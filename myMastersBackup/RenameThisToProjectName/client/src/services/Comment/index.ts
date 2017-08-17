@@ -22,7 +22,9 @@ export {
   onCommentViewMoreTrue,
   onCommentViewMoreFalse,
   editCommentFilmStrip,
-  cancelCommentEditFilmstrip,
+  onCommentHover,
+  onCommentNotHover,
+  onCommentCancelText
 } from './Actions';
 
 export {

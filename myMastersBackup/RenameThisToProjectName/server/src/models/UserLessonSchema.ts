@@ -52,6 +52,10 @@ const commentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  PreviousText:{
+    type: String,
+    required: true,
+  },
   Parent:{
     type: String,
   },
